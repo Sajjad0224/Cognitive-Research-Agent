@@ -1,0 +1,3 @@
+from django.urls import path
+from .views import SessionListCreateView,SessionEventListView,api_agent,api_access,api_hypothesis,api_link_evidence,api_contradiction,api_submit,start_session
+urlpatterns=[path('',SessionListCreateView.as_view()),path('<uuid:session_id>/events/',SessionEventListView.as_view()),path('<uuid:session_id>/agent/',api_agent),path('<uuid:session_id>/evidence/<uuid:evidence_id>/',api_access),path('<uuid:session_id>/hypotheses/',api_hypothesis),path('<uuid:session_id>/hypotheses/<uuid:hypothesis_id>/evidence/<uuid:evidence_id>/',api_link_evidence),path('<uuid:session_id>/contradictions/',api_contradiction),path('<uuid:session_id>/submit/',api_submit),path('start/<uuid:case_id>/',start_session,name='start-session')]
