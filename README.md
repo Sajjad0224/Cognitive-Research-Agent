@@ -40,12 +40,12 @@ pip install -r requirements.txt
 copy .env.example .env   # Windows
 # cp .env.example .env  # macOS/Linux
 python manage.py migrate
+python manage.py createsuperuser
 python manage.py seed_demo
-python manage.py createsuperuser  # optional if seed command is not used
 python manage.py runserver
 ```
 
-Open `/` and sign in with the seeded admin account (`admin` / `ChangeMe123!`) for a development environment. Change the password immediately.
+Create a Django superuser before running `seed_demo`; the command never stores or creates a default password.
 
 ## MySQL
 
