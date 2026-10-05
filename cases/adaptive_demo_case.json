@@ -1,0 +1,36 @@
+{
+  "case_id": "CASE-ADAPT-01",
+  "title": "The Quiet Warehouse Fire",
+  "domain": "workplace safety",
+  "difficulty": "easy",
+  "overview": "A small fire broke out in a storage warehouse after hours. No one was hurt, but the cause is unclear.",
+  "objective": "Determine what most likely caused the fire.",
+  "time_limit_minutes": null,
+  "hypotheses": [
+    {"id": "A1", "level": "correct", "statement": "A faulty space heater left running overnight started the fire.",
+     "match_keywords": ["heater", "space heater", "faulty", "overheated", "left on"]},
+    {"id": "A2", "level": "incorrect", "statement": "The fire was started deliberately by a disgruntled employee.",
+     "match_keywords": ["arson", "deliberate", "disgruntled", "employee", "set fire"]}
+  ],
+  "evidence": [
+    {"id": "A-01", "title": "Fire department summary", "type": "report", "reliability": 0.9, "relevance": 0.4, "directness": 0.3,
+     "initial": true, "content": "Fire originated near the east storage racks. No accelerant odor noted. Investigation ongoing."},
+    {"id": "A-02", "title": "Warehouse floor plan", "type": "document", "reliability": 1.0, "relevance": 0.2, "directness": 0.1,
+     "initial": true, "content": "East racks are used for overflow stock; a small break area with a space heater sits nearby."},
+    {"id": "A-03", "title": "Maintenance log", "type": "log", "reliability": 0.9, "relevance": 0.8, "directness": 0.7,
+     "supports": ["A1"], "contradicts": ["A2"],
+     "unlock": {"keywords": ["heater", "maintenance", "electrical"]},
+     "content": "The space heater in the east break area was flagged for a frayed cord three weeks ago; the work order was never closed."},
+    {"id": "A-04", "title": "Extra: security guard's note (contextual hint)", "type": "note",
+     "reliability": 0.7, "relevance": 0.6, "directness": 0.5, "supports": ["A1"],
+     "adaptive": {"trigger": "stall", "after": 2},
+     "content": "Hint: the night guard's log mentions the break-area heater was still glowing red when he did his 11 PM round."},
+    {"id": "A-05", "title": "Extra: badge log around the fire (twist)", "type": "log",
+     "reliability": 0.85, "relevance": 0.5, "directness": 0.4, "contradicts": ["A2"],
+     "adaptive": {"trigger": "strong", "after": 2},
+     "content": "Twist: no employee badges were used to enter the warehouse after 9 PM, hours before the fire started."}
+  ],
+  "contradictions": [],
+  "required_evidence": ["A-03"],
+  "scoring_weights": {}
+}

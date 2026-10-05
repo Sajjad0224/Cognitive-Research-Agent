@@ -1,0 +1,1141 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cognitive Research Agent</title>
+<style>
+:root{
+  --bg:#faf8f5;--bg-alt:#fff;--card:#ffffff;--tx:#201a14;--mu:#766c60;--bd:#ece3d6;
+  --ac:#ff6a1a;--ac-dark:#e35300;--ac-light:#fff1e4;--ok:#1b7f4b;--bad:#c23616;--wa:#9a6700;
+  --shadow-sm:0 1px 3px rgba(32,20,10,.06);--shadow-md:0 10px 28px -10px rgba(32,20,10,.16);--shadow-lg:0 26px 60px -22px rgba(32,20,10,.32);
+  --r-sm:8px;--r-md:12px;--r-lg:18px}
+@media(prefers-color-scheme:dark){:root{--bg:#15120f;--bg-alt:#1c1814;--card:#211c17;--tx:#f3ece3;--mu:#ab9f8f;--bd:#372f26;--ac:#ff8a3d;--ac-dark:#ff6a1a;--ac-light:#2c2119;--ok:#5fd394;--bad:#ff8a80;--wa:#e0b040}}
+*{box-sizing:border-box}html,body{overflow-x:hidden;max-width:100%}body{margin:0;font:15px/1.55 -apple-system,system-ui,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx)}
+header{display:flex;justify-content:space-between;align-items:center;padding:0 22px;height:58px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:20;box-shadow:var(--shadow-sm)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(150deg,var(--ac),var(--ac-dark));display:flex;align-items:center;justify-content:center;color:#fff;flex:none;box-shadow:0 4px 12px -4px rgba(255,106,26,.55)}
+header b{font-size:15.5px;font-weight:700;letter-spacing:-.01em}
+main{max-width:1280px;margin:0 auto;padding:22px 20px 60px}
+#who{display:flex;align-items:center;gap:14px}
+nav{display:flex;gap:4px;background:var(--bg);border:1px solid var(--bd);border-radius:999px;padding:3px}
+nav button{border:none;background:transparent;border-radius:999px;padding:6px 14px;font-size:13.5px;font-weight:500;color:var(--mu)}
+nav button.on{background:var(--card);color:var(--ac-dark);box-shadow:var(--shadow-sm);font-weight:600}
+.userchip{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--mu)}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 8px;border-bottom:1px solid var(--bd);text-align:left}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r-md);padding:16px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;align-items:start}
+h2{font-size:16px;margin:0 0 10px;font-weight:700}h3{font-size:14px;margin:12px 0 6px;font-weight:600}
+button{font:inherit;padding:7px 14px;border-radius:var(--r-sm);border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer;transition:background .15s,border-color .15s,transform .1s,box-shadow .15s}
+button:hover{border-color:var(--ac)}button:active{transform:translateY(1px)}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600;box-shadow:0 6px 16px -6px rgba(255,106,26,.5)}
+button.p:hover{background:var(--ac-dark);border-color:var(--ac-dark)}
+button:disabled{opacity:.5;cursor:default;transform:none}
+input,textarea,select{font:inherit;width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:var(--r-sm);background:var(--bg-alt);color:var(--tx);transition:border-color .15s,box-shadow .15s}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px var(--ac-light)}
+textarea{min-height:64px;resize:vertical}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}.row>*{width:auto}.row>.f{flex:1;min-width:120px}
+.mu{color:var(--mu);font-size:13px}.tag{font-size:11.5px;border:1px solid var(--bd);border-radius:20px;padding:2px 10px;color:var(--mu);font-weight:600;white-space:nowrap}
+.ev{border:1px solid var(--bd);border-radius:var(--r-sm);padding:8px;margin-bottom:8px}.ev p{margin:6px 0;white-space:pre-wrap}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.wa{color:var(--wa)}
+.chat{max-height:260px;overflow:auto;margin-bottom:8px}.q{font-weight:600;margin-top:8px}.a{white-space:pre-wrap;color:var(--mu)}
+#toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--bad);color:#fff;padding:9px 16px;border-radius:8px;max-width:90%;box-shadow:var(--shadow-lg)}
+.score{font-size:30px;font-weight:700}ul{margin:4px 0;padding-left:20px}.narrow{max-width:420px;margin:30px auto}
+
+/* ---- Dashboard / Cases (Step 2: premium white+orange redesign) ---- */
+.welcome{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:18px;margin-bottom:22px}
+.welcome h1{font-size:24px;margin:0 0 4px;letter-spacing:-.01em}
+.stat-row{display:flex;gap:12px;flex-wrap:wrap}
+.stat-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r-md);padding:12px 20px;min-width:108px;text-align:center;box-shadow:var(--shadow-sm)}
+.stat-num{font-size:22px;font-weight:700;color:var(--ac-dark)}
+.stat-label{font-size:11.5px;color:var(--mu);margin-top:2px}
+.dash-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.search-wrap{position:relative;flex:1;min-width:220px;display:flex;align-items:center}
+.search-wrap svg{position:absolute;left:11px;opacity:.5;pointer-events:none}
+.search-wrap input{padding-left:36px}
+.dash-toolbar select{width:auto;min-width:150px}
+.section-title{margin-top:26px}
+.case-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm);transition:box-shadow .18s,transform .18s,border-color .18s;display:flex;flex-direction:column;gap:6px}
+.case-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--ac-light)}
+.case-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.case-card h3{font-size:15.5px;margin:2px 0 0}
+.case-domain{text-transform:uppercase;letter-spacing:.04em;font-size:11px;font-weight:600;color:var(--ac-dark)}
+.case-overview{font-size:13.5px;color:var(--mu);margin:4px 0 2px;flex:1}
+.case-meta{font-size:12px}
+.case-cta{width:100%;justify-content:center;margin-top:8px}
+.diff-easy{background:#eaf7ee;color:#1b7f4b;border-color:#cdeeda}
+.diff-medium{background:var(--ac-light);color:var(--ac-dark);border-color:#ffe0c2}
+.diff-hard{background:#fdeceb;color:#c23616;border-color:#f8d2cd}
+.tag-done{background:#eaf7ee;color:#1b7f4b;border-color:#cdeeda}
+.tag-progress{background:var(--ac-light);color:var(--ac-dark);border-color:#ffe0c2}
+.activity-row{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.activity-row:last-child{border-bottom:none}
+.activity-main{flex:1;min-width:180px}
+.empty-state{grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--mu);background:var(--card);border:1px dashed var(--bd);border-radius:var(--r-lg)}
+.skel{background:linear-gradient(90deg,var(--bd) 25%,var(--bg) 37%,var(--bd) 63%);background-size:400% 100%;animation:skel 1.4s ease infinite;border-radius:var(--r-lg);height:180px}
+@keyframes skel{0%{background-position:100% 50%}100%{background-position:0 50%}}
+@media(max-width:720px){header{padding:0 14px}main{padding:16px 12px 48px}.welcome{align-items:flex-start}.stat-row{width:100%}.stat-card{flex:1}.dash-toolbar select{flex:1;min-width:0}}
+@media(max-width:480px){.dash-toolbar .search-wrap{min-width:100%}.dash-toolbar select{min-width:0;flex:1}}
+@media(max-width:600px){
+  header{height:auto;flex-wrap:wrap;row-gap:8px;padding:10px 14px}
+  #who{flex-wrap:wrap;gap:8px;width:100%;justify-content:flex-start}
+  nav{order:2}
+  .userchip{flex-wrap:wrap;gap:6px;width:100%;justify-content:space-between}
+  .userchip span{max-width:62vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chat-identity{flex-wrap:wrap;row-gap:2px}
+  .chat-identity .mu{width:100%;margin-left:16px}
+  .score-ring{margin:0 auto}
+  .report-top{text-align:center}
+  .report-meta{align-items:center}
+}
+
+/* ---- Investigation workspace (Step 3: premium redesign + knowledge graph) ---- */
+.ws-header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ws-header-actions{display:flex;gap:8px}
+.ws-title{font-size:21px;margin:4px 0 6px;letter-spacing:-.01em}
+.ws-overview{color:var(--mu);font-size:13.5px;margin:0 0 10px;max-width:760px}
+.ws-objective{background:var(--ac-light);border:1px solid #ffe0c2;border-radius:var(--r-sm);padding:9px 12px;font-size:13px;margin-bottom:12px;display:flex;gap:8px}
+.ws-objective b{color:var(--ac-dark);flex:none}
+@media(prefers-color-scheme:dark){.ws-objective{border-color:#4a2e16}}
+.ws-progress-bar{height:7px;border-radius:5px;background:var(--bd);overflow:hidden;margin-bottom:6px}
+.ws-progress-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac-dark));border-radius:5px;transition:width .4s ease}
+.ws-tabs{display:flex;gap:4px;overflow-x:auto;background:var(--card);border:1px solid var(--bd);border-radius:999px;padding:4px;margin:14px 0;width:fit-content;max-width:100%}
+.ws-tab{border:none;background:transparent;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:500;color:var(--mu);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.ws-tab.on{background:var(--ac-light);color:var(--ac-dark);font-weight:700}
+.ws-tab-badge{background:var(--bg);border:1px solid var(--bd);border-radius:999px;font-size:11px;padding:0 6px;color:var(--mu)}
+.ws-tab.on .ws-tab-badge{background:#fff;border-color:#ffe0c2}
+
+.ev-grid{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.ev-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r-md);padding:14px;box-shadow:var(--shadow-sm);transition:box-shadow .18s,transform .18s;display:flex;flex-direction:column;gap:6px;animation:auth-in .25s ease}
+.ev-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.ev-card.ev-locked{border-style:dashed;background:var(--bg-alt)}
+.ev-card-top{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.ev-type-badge{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;color:var(--ac-dark);background:var(--ac-light);border-radius:6px;padding:2px 7px}
+.ev-card h3{margin:2px 0 0;font-size:14.5px}
+.ev-content{font-size:13px;color:var(--tx);white-space:pre-wrap;margin:2px 0}
+.ev-locked-msg{font-size:12.5px;margin:2px 0}
+.ev-relevance{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px}
+.ev-toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--mu);white-space:nowrap}
+.ev-toggle input{width:auto}
+.contradiction-card h3{color:var(--bad)}
+.contradiction-row{display:flex;align-items:center;gap:8px;font-size:13.5px;padding:6px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.contradiction-row:last-child{border-bottom:none}
+
+.hyp-grid{display:grid;gap:12px}
+.hyp-card{border:1px solid var(--bd);border-radius:var(--r-md);padding:12px;background:var(--bg-alt)}
+.hyp-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.hyp-statement{font-size:14px;margin:0 0 8px}
+.hyp-links{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.hyp-status-active{background:var(--ac-light);color:var(--ac-dark);border-color:#ffe0c2}
+.hyp-status-supported{background:#eaf7ee;color:#1b7f4b;border-color:#cdeeda}
+.hyp-status-refuted{background:#fdeceb;color:#c23616;border-color:#f8d2cd}
+.hyp-status-abandoned{background:var(--bg);color:var(--mu)}
+.conclude-card{border-color:var(--ac)}
+.cite-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:2px;margin:6px 0 12px}
+.cite-item{font-size:13px}
+.notes-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.note-item{background:var(--bg-alt);border:1px solid var(--bd);border-radius:var(--r-sm);padding:8px 10px;font-size:13.5px;white-space:pre-wrap}
+
+.timeline-list{display:flex;flex-direction:column}
+.timeline-row{display:flex;gap:10px;padding:9px 2px;border-bottom:1px solid var(--bd);align-items:flex-start}
+.timeline-row:last-child{border-bottom:none}
+.timeline-icon{width:26px;height:26px;border-radius:50%;background:var(--ac-light);display:flex;align-items:center;justify-content:center;flex:none;font-size:13px}
+.timeline-body{font-size:13.5px}
+
+.chat-card{display:flex;flex-direction:column}
+.chat-log{max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px 10px}
+.chat-msg{display:flex}
+.chat-user{justify-content:flex-end}
+.chat-ai{justify-content:flex-start}
+.chat-bubble{max-width:78%;padding:9px 13px;border-radius:14px;font-size:13.5px;white-space:pre-wrap;line-height:1.5}
+.chat-user .chat-bubble{background:var(--ac);color:#fff;border-bottom-right-radius:4px}
+.chat-ai .chat-bubble{background:var(--bg-alt);border:1px solid var(--bd);border-bottom-left-radius:4px}
+.chat-thinking{display:flex;gap:4px;align-items:center;padding:12px 16px}
+.chat-thinking span{width:6px;height:6px;border-radius:50%;background:var(--mu);animation:chat-bounce 1.1s infinite ease-in-out}
+.chat-thinking span:nth-child(2){animation-delay:.15s}.chat-thinking span:nth-child(3){animation-delay:.3s}
+@keyframes chat-bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-4px);opacity:1}}
+.chat-input-row{margin-top:8px}
+
+.graph-toolbar{display:flex;justify-content:space-between;align-items:center}
+.graph-legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:8px 0 12px;font-size:12.5px;color:var(--mu)}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+.legend-evidence{background:var(--ac-light);border:2px solid var(--ac)}
+.legend-hypothesis{background:#eef1f5;border:2px solid #44506b}
+.legend-line{width:20px;height:0;border-top:2px solid;display:inline-block}
+.legend-supports{border-color:#1b7f4b}
+.legend-contradicts{border-color:#c23616}
+.legend-flag{border-top-style:dashed;border-color:#b8860b}
+.graph-wrap{overflow-x:auto;border:1px solid var(--bd);border-radius:var(--r-md);background:var(--bg-alt);padding:8px}
+.graph-svg{display:block}
+.graph-node{cursor:pointer}
+.graph-node circle,.graph-node rect{fill:var(--ac-light);stroke:var(--ac);stroke-width:2;transition:filter .15s}
+.graph-node.node-hypothesis circle,.graph-node.node-hypothesis rect{fill:#eef1f5;stroke:#44506b}
+.graph-node.node-status-supported rect{stroke:#1b7f4b}
+.graph-node.node-status-refuted rect{stroke:#c23616}
+.graph-node.node-status-abandoned rect{stroke:#9aa3af;stroke-dasharray:4 3}
+.graph-node:hover circle,.graph-node:hover rect{filter:brightness(.96)}
+.graph-node.selected circle,.graph-node.selected rect{stroke-width:3.5}
+.node-label{font-size:10.5px;text-anchor:middle;fill:var(--tx);pointer-events:none;font-weight:600}
+.graph-row-label text{font-size:11px;fill:var(--mu);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.graph-edge line{stroke:#9aa3af;stroke-width:1.6}
+.graph-edge.edge-supports line{stroke:#1b7f4b}
+.graph-edge.edge-contradicts line{stroke:#c23616}
+.graph-edge.edge-flag line{stroke:#b8860b;stroke-dasharray:5 4}
+.edge-label{font-size:9.5px;fill:var(--mu);text-anchor:middle}
+.graph-edge marker path{fill:#9aa3af}
+.graph-edge.edge-supports marker path{fill:#1b7f4b}
+.graph-edge.edge-contradicts marker path{fill:#c23616}
+.graph-detail{margin-top:10px;padding:10px 12px;border:1px solid var(--bd);border-radius:var(--r-sm);background:var(--bg-alt);font-size:13px}
+.graph-loading{display:flex;align-items:center;gap:10px;padding:40px 0;justify-content:center}
+.graph-spin{border-color:rgba(255,106,26,.25);border-top-color:var(--ac)}
+@media(max-width:720px){.ws-header-top{flex-wrap:wrap;gap:8px}.cite-grid{grid-template-columns:1fr}}
+
+/* ---- AI Investigator chat (Phase 5) ---- */
+.chat-identity{display:flex;align-items:center;gap:8px;padding-bottom:10px;margin-bottom:8px;border-bottom:1px solid var(--bd);font-size:13px}
+.chat-identity-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(27,127,75,.15);flex:none;animation:dot-pulse 2s infinite}
+@keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.chat-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(150deg,var(--ac),var(--ac-dark));color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.chat-ai{align-items:flex-end;gap:8px}
+.chat-ai-body{display:flex;flex-direction:column;gap:4px;max-width:78%}
+.chat-ai .chat-bubble{max-width:100%}
+.chat-empty{padding:28px 16px}
+.chat-suggestions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.chat-suggestion{font-size:12.5px;border-radius:999px;padding:6px 13px;background:var(--ac-light);border-color:#ffe0c2;color:var(--ac-dark)}
+.chat-suggestion:hover{background:#ffe3c7}
+.chat-evidence-refs{display:flex;flex-wrap:wrap;gap:6px}
+.chat-ev-chip{font-size:11.5px;padding:3px 10px;border-radius:999px;background:var(--bg-alt);color:var(--mu);border-color:var(--bd)}
+.chat-ev-chip:hover{border-color:var(--ac);color:var(--ac-dark)}
+.chat-bubble.chat-error{background:#fdeceb;border:1px solid #f8d2cd;color:#c23616}
+.chat-thinking em{font-style:normal;color:var(--mu);font-size:12px;margin-left:4px}
+
+/* ---- Cognitive Performance Report (Phase 6) ---- */
+.report-top{display:flex;gap:26px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.report-actions{display:flex;gap:8px}
+.score-ring{width:128px;height:128px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;position:relative}
+.score-ring-inner{width:100px;height:100px;border-radius:50%;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:var(--shadow-sm)}
+.score-ring-num{font-size:28px;font-weight:800;color:var(--tx);line-height:1}
+.score-ring-label{font-size:10.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.report-meta{display:flex;flex-direction:column;gap:6px}
+.report-meta-title{font-size:20px;font-weight:700;letter-spacing:-.01em}
+.report-status-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.perf-breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:18px}
+.perf-item{display:flex;flex-direction:column;gap:6px}
+.perf-item-top{display:flex;justify-content:space-between;font-size:13px}
+.perf-item-top b{font-size:15px}
+.perf-bar{height:8px;border-radius:6px;background:var(--bd);overflow:hidden}
+.perf-bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--ac),var(--ac-dark))}
+.flag-banner{display:flex;gap:8px;align-items:flex-start;background:#fff6e9;border:1px solid #f3dca8;color:#8a6200;border-radius:var(--r-sm);padding:9px 12px;font-size:13px;margin-top:10px}
+@media(prefers-color-scheme:dark){.flag-banner{background:#3a2c0f;border-color:#5c481c;color:var(--wa)}}
+.skill-row{padding:12px 0;border-bottom:1px solid var(--bd)}
+.skill-row:last-child{border-bottom:none}
+.skill-row-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px}
+.skill-name{font-weight:600;font-size:13.5px}
+.skill-score{font-weight:700;font-size:13.5px}
+.skill-score.band-strong{color:#1b7f4b}.skill-score.band-mid{color:var(--ac-dark)}.skill-score.band-weak{color:#c23616}.skill-score.band-na{color:var(--mu)}
+.skill-bar{height:7px;border-radius:5px;background:var(--bd);overflow:hidden;margin-bottom:6px}
+.skill-bar-fill{height:100%;border-radius:5px}
+.skill-bar-fill.band-strong{background:#1b7f4b}.skill-bar-fill.band-mid{background:var(--ac)}.skill-bar-fill.band-weak{background:#c23616}.skill-bar-fill.band-na{background:var(--bd)}
+.skill-explanation{font-size:12.5px;color:var(--mu);line-height:1.5}
+.coverage-note{font-size:11px;color:var(--mu);margin-top:3px}
+.behavior-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.behavior-tile{background:var(--bg-alt);border:1px solid var(--bd);border-radius:var(--r-sm);padding:10px 12px}
+.behavior-tile-val{font-size:18px;font-weight:700;color:var(--ac-dark)}
+.behavior-tile-label{font-size:11.5px;color:var(--mu);margin-top:1px}
+.insight-card{border-left:4px solid var(--bd)}
+.insight-card.insight-strength{border-left-color:#1b7f4b}
+.insight-card.insight-improve{border-left-color:var(--ac)}
+.insight-card.insight-missed{border-left-color:#c23616}
+.insight-card.insight-recommend{border-left-color:#44506b}
+.insight-list{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.insight-list li{font-size:13.5px;padding-left:20px;position:relative;line-height:1.5}
+.insight-list li::before{content:'';position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:50%;background:var(--ac)}
+.insight-strength .insight-list li::before{background:#1b7f4b}
+.insight-missed .insight-list li::before{background:#c23616}
+.insight-recommend .insight-list li::before{background:#44506b}
+.decision-list .timeline-row:first-child{padding-top:0}
+.report-grid{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.report-notice{font-size:12px;color:var(--mu);border-top:1px solid var(--bd);padding-top:12px;margin-top:4px}
+@media(max-width:720px){.report-top{flex-direction:column;align-items:flex-start}.score-ring{width:104px;height:104px}.score-ring-inner{width:82px;height:82px}.score-ring-num{font-size:22px}}
+@media print{
+  header,.ws-header-top,.ws-header .ws-header-actions,nav,#toast,.report-actions,button{display:none!important}
+  body{background:#fff}
+  main{max-width:100%;padding:0}
+  .card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
+  .report-top{display:flex}
+  a,button[data-a="home"]{display:none}
+}
+
+/* ---- Cognitive Profile dashboard (Phase 7) ---- */
+.profile-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:4px}
+.profile-header h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+.profile-stat-row{display:flex;gap:12px;flex-wrap:wrap}
+.trend-badge{font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.trend-improving{background:#eaf7ee;color:#1b7f4b}
+.trend-steady{background:var(--ac-light);color:var(--ac-dark)}
+.trend-needs_focus{background:#fdeceb;color:#c23616}
+.trend-none{background:var(--bg-alt);color:var(--mu);border:1px solid var(--bd)}
+.skill-card-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.skill-card-row .skill-name{font-size:14px}
+.skill-sparkline{flex:none}
+.skill-sparkline path.spark-line{fill:none;stroke:var(--ac);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.skill-sparkline circle{fill:var(--ac)}
+.skill-meta{font-size:11.5px;color:var(--mu);margin-top:4px}
+.history-table-wrap{overflow-x:auto}
+.history-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.history-table th{text-align:left;padding:8px 10px;color:var(--mu);font-weight:600;border-bottom:2px solid var(--bd);white-space:nowrap}
+.history-table td{padding:9px 10px;border-bottom:1px solid var(--bd);vertical-align:middle}
+.history-table tr:last-child td{border-bottom:none}
+.history-table tr:hover td{background:var(--bg-alt)}
+.rec-source-note{font-size:11.5px;color:var(--mu);margin-bottom:10px}
+.profile-grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+
+/* ---- Admin dashboard (Phase 8) ---- */
+.admin-tabs{display:flex;gap:4px;overflow-x:auto;background:var(--card);border:1px solid var(--bd);border-radius:999px;padding:4px;margin:14px 0;width:fit-content;max-width:100%}
+.admin-tab{border:none;background:transparent;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:500;color:var(--mu);white-space:nowrap}
+.admin-tab.on{background:var(--ac-light);color:var(--ac-dark);font-weight:700}
+.admin-analytics-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.admin-analytics-table th{text-align:left;padding:8px 10px;color:var(--mu);font-weight:600;border-bottom:2px solid var(--bd);white-space:nowrap;cursor:pointer;user-select:none}
+.admin-analytics-table th:hover{color:var(--ac-dark)}
+.admin-analytics-table td{padding:9px 10px;border-bottom:1px solid var(--bd)}
+.admin-analytics-table tr:hover td{background:var(--bg-alt)}
+.admin-case-row{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.admin-case-row:last-child{border-bottom:none}
+.admin-case-main{flex:1;min-width:180px}
+.admin-case-id{font-family:monospace;font-size:11.5px;color:var(--mu);background:var(--bg-alt);border-radius:5px;padding:1px 6px;margin-right:6px}
+.admin-json-area{min-height:260px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;tab-size:2}
+.admin-form-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+@media(max-width:720px){.profile-header{flex-direction:column}.skill-card-row{flex-direction:column;align-items:flex-start}}
+
+/* ---- Auth screen only (Step 1: Login/Register redesign) ---- */
+.auth-shell{min-height:calc(100vh - 53px);display:flex;align-items:center;justify-content:center;padding:24px}
+.auth-grid{display:grid;grid-template-columns:1.1fr 1fr;max-width:920px;width:100%;background:var(--card);border:1px solid var(--bd);border-radius:18px;overflow:hidden;box-shadow:0 24px 60px -24px rgba(20,30,50,.3)}
+.auth-brand{background:linear-gradient(160deg,var(--ac),var(--ac-dark) 130%);color:#fff;padding:44px 38px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+@media(prefers-color-scheme:dark){.auth-brand{background:linear-gradient(160deg,#ff8a3d,#b33e00 130%)}}
+.auth-brand h1{font-size:22px;margin:0 0 8px;letter-spacing:-.02em;font-weight:700}
+.auth-brand p{font-size:14px;opacity:.88;margin:0;max-width:280px;line-height:1.55}
+.auth-mark{width:42px;height:42px;border-radius:11px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;margin-bottom:24px}
+.auth-points{display:flex;flex-direction:column;gap:14px;margin:36px 0 0;padding:0}
+.auth-points li{display:flex;gap:10px;align-items:flex-start;list-style:none;font-size:13px;opacity:.95;line-height:1.4}
+.auth-points svg{flex:none;margin-top:2px}
+.auth-panel{padding:42px 40px;display:flex;flex-direction:column;justify-content:center;animation:auth-in .32s ease}
+@keyframes auth-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.auth-panel h2{font-size:21px;margin:0 0 5px;letter-spacing:-.01em}
+.auth-sub{color:var(--mu);font-size:13.5px;margin:0 0 24px}
+.auth-field{margin-bottom:16px}
+.auth-field label{display:block;font-size:12.5px;font-weight:600;color:var(--mu);margin-bottom:5px;letter-spacing:.01em}
+.auth-input-wrap{position:relative;display:flex;align-items:center}
+.auth-input-wrap svg{position:absolute;left:11px;opacity:.5;pointer-events:none}
+.auth-input-wrap input{padding-left:36px}
+.auth-input-wrap input:focus{outline:2px solid var(--ac);outline-offset:-1px;border-color:var(--ac)}
+.auth-consent{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:18px}
+.auth-consent p{font-size:12px;color:var(--mu);margin:0 0 8px;max-height:84px;overflow:auto;line-height:1.5}
+.auth-consent label{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;cursor:pointer}
+.auth-consent input{width:auto;margin-top:2px}
+.auth-err{background:#fde8e6;border:1px solid var(--bad);color:#8a1d15;font-size:13px;border-radius:8px;padding:9px 12px;margin-bottom:16px;animation:auth-in .2s ease}
+@media(prefers-color-scheme:dark){.auth-err{background:rgba(255,138,128,.14);color:var(--bad)}}
+.auth-submit{width:100%;justify-content:center;display:flex;align-items:center;gap:8px;padding:11px;font-size:14.5px;font-weight:600;letter-spacing:.01em;border-radius:9px;margin-top:4px;transition:opacity .15s}
+.auth-switch{text-align:center;margin-top:22px;font-size:13.5px;color:var(--mu)}
+.auth-switch button{border:none;background:none;color:var(--ac);font-weight:600;cursor:pointer;padding:0;font-size:inherit}
+.auth-switch button:hover{text-decoration:underline}
+.auth-spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;animation:auth-spin .7s linear infinite;flex:none}
+@keyframes auth-spin{to{transform:rotate(360deg)}}
+@media(max-width:760px){.auth-grid{grid-template-columns:1fr;border-radius:14px}.auth-brand{display:none}.auth-panel{padding:30px 24px}.auth-shell{padding:16px}}
+
+/* ---- Privacy, sharing, and interaction polish ---- */
+button:focus-visible,[role="button"]:focus-visible,a:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+#toast{z-index:60;background:#8f2d1a;transition:opacity .18s ease,transform .18s ease}
+#toast.toast-success{background:#176c40}#toast.toast-info{background:#29231d}
+.privacy-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;padding:24px 0 20px;border-bottom:1px solid var(--bd);margin-bottom:20px}
+.privacy-hero h1,.shared-hero h1{font-size:25px;line-height:1.2;margin:0 0 6px}
+.privacy-hero p,.shared-hero p{max-width:650px;margin:0;color:var(--mu)}
+.privacy-mark{display:flex;align-items:center;gap:8px;color:var(--ok);font-size:13px;font-weight:600;white-space:nowrap}
+.privacy-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:stretch}
+.privacy-panel{margin:0;padding:18px;min-width:0}
+.privacy-panel h2{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.privacy-panel p{margin:6px 0}
+.privacy-account{border-top:3px solid var(--ac)}
+.privacy-data-list{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.privacy-data-list li{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--mu)}
+.privacy-data-list li::before{content:"";width:7px;height:7px;margin-top:7px;border-radius:50%;background:var(--ac);flex:none}
+.privacy-action{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)}
+.privacy-status{font-size:13px;margin-top:10px}
+.privacy-status:empty{display:none}
+.privacy-status.status-success{color:var(--ok)}.privacy-status.status-error{color:var(--bad)}
+.privacy-danger{border-color:color-mix(in srgb,var(--bad) 36%,var(--bd))}
+.privacy-danger button{color:var(--bad);border-color:var(--bad)}
+.privacy-danger button:hover{background:var(--bad);color:#fff}
+.privacy-consent{grid-column:1/-1;background:var(--bg-alt)}
+.privacy-consent blockquote{margin:12px 0 0;padding:12px 14px;border-left:3px solid var(--ac);background:var(--bg);color:var(--mu);font-size:13px;white-space:pre-wrap}
+.shared-shell{max-width:1000px;margin:0 auto}
+.shared-hero{padding:24px 0 18px;border-bottom:1px solid var(--bd);margin-bottom:18px}
+.shared-banner{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1px solid #ffe0c2;background:var(--ac-light);border-radius:var(--r-sm);color:var(--ac-dark);font-size:13px;margin-bottom:18px}
+.shared-banner b{display:block;color:var(--tx)}
+.shared-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.shared-grid .card{min-width:0}
+.shared-evidence{padding:12px 0;border-bottom:1px solid var(--bd)}.shared-evidence:last-child{border-bottom:0;padding-bottom:0}
+.shared-evidence h3{margin:4px 0;font-size:14px}
+.shared-evidence p{margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.shared-links{display:grid;gap:7px;margin:10px 0}
+.shared-links .tag{white-space:normal}
+.shared-report-score{font-size:34px;font-weight:750;color:var(--ac-dark);line-height:1.1}
+.shared-report-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:12px;margin-top:16px}
+.shared-report-metric{font-size:12px;color:var(--mu)}.shared-report-metric b{display:block;color:var(--tx);font-size:15px;margin-bottom:5px}
+.shared-report-track{height:6px;border-radius:5px;background:var(--bd);overflow:hidden}.shared-report-fill{height:100%;background:var(--ac);border-radius:5px}
+.dialog-backdrop{background:rgba(32,26,20,.52);backdrop-filter:blur(3px);border:0;padding:18px;max-width:min(480px,calc(100vw - 28px));width:100%;border-radius:var(--r-md);color:var(--tx);box-shadow:var(--shadow-lg)}
+.dialog-backdrop::backdrop{background:rgba(32,26,20,.52);backdrop-filter:blur(3px)}
+.dialog-form{position:relative}.dialog-form h2{font-size:18px;margin:0 32px 8px 0}.dialog-form p{margin:0 0 16px;color:var(--mu);font-size:13.5px}
+.dialog-close{position:absolute;right:0;top:-4px;width:32px;height:32px;padding:0;font-size:20px;line-height:1}
+.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.dialog-danger{background:var(--bad);border-color:var(--bad)}.dialog-danger:hover{background:#a82d13;border-color:#a82d13}
+.confirm-phrase{display:block;margin-top:12px;font-size:12.5px;font-weight:600}.confirm-phrase[hidden]{display:none}.confirm-phrase input{margin-top:6px}
+.share-url-row{display:flex;gap:8px;margin-top:12px}.share-url-row input{min-width:0;font-size:12px}
+.share-permission{font-size:12px;color:var(--mu);margin:8px 0 0}
+@media(max-width:620px){.privacy-grid,.shared-grid{grid-template-columns:minmax(0,1fr)}.privacy-consent{grid-column:auto}.privacy-action{align-items:flex-start;flex-direction:column}.share-url-row{flex-direction:column}.share-url-row button{width:100%}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style></head><body>
+<header><div class="brand"><div class="brand-mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="m20 20-3.2-3.2"/></svg></div><b>Cognitive Research Agent</b></div><span id="who"></span></header>
+<main id="app"></main><div id="toast" hidden role="status" aria-live="polite"></div>
+<dialog id="confirmDialog" class="dialog-backdrop" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+  <form class="dialog-form" method="dialog">
+    <button type="button" class="dialog-close" data-a="confirm-cancel" aria-label="Close confirmation">&times;</button>
+    <h2 id="confirmTitle"></h2><p id="confirmMessage"></p>
+    <label id="confirmPhraseWrap" class="confirm-phrase" hidden>Type DELETE to confirm<input id="confirmPhrase" autocomplete="off" spellcheck="false"></label>
+    <div class="dialog-actions"><button type="button" data-a="confirm-cancel">Cancel</button><button id="confirmAccept" type="button" class="p dialog-danger" data-a="confirm-accept"></button></div>
+  </form>
+</dialog>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let token=null,user=null,sid=null,ws=null,rep=null,chat=[],cases=[],consent=null,mode='login';
+let page='cases',profileData=null,adminCases=null,analytics=null,caseDraft='';
+let mySessions=[],casesLoaded=false,caseFilter={q:'',difficulty:'all',sort:'title'};
+let profileLatestRec=null,profileLatestRecLoading=false,profileLatestRecError=null,profileLoadError=null;
+let adminTab='analytics',adminLoadError=null;
+let adminAnalyticsFilter={q:'',sort:'attempts'},adminCaseFilter={q:''};
+let wsTab='evidence',wsGraph=null,wsGraphLoading=false,wsGraphError=null,wsActivity=[],chatThinking=false,chatError=null,evFilter={q:'',onlyUnopened:false};
+let privacyNotice=null,privacyLoadError=null,privacyExportState='idle',privacyExportError='',privacyDeleteBusy=false;
+let sharedToken=new URLSearchParams(location.search).get('shared')||location.pathname.match(/^\/shared\/([^/]+)\/?$/)?.[1]||null,sharedData=null,sharedLoading=false,sharedError='';
+let shareUrl='',shareSessionId=null,confirmResolver=null;
+const CHAT_SUGGESTIONS=['What happened on the timeline?','Who are the people involved?','Interview the key people involved','Show me the financial or log records','Is there anything inconsistent in the evidence?'];
+try{token=sessionStorage.getItem('t')}catch(e){}
+function fmtErr(d){const x=d&&d.detail;if(typeof x==='string')return x;if(Array.isArray(x))return x.map(e=>(e.loc||[]).slice(1).join('.')+': '+e.msg).join('; ');return''}
+async function api(m,p,b){
+  const h={'Content-Type':'application/json'};if(token)h.Authorization='Bearer '+token;
+  const r=await fetch(p,{method:m,headers:h,body:b===undefined?undefined:JSON.stringify(b)});
+  if(r.status===204)return null;
+  let d=null;try{d=await r.json()}catch(e){}
+  if(!r.ok){if(r.status===401&&token&&!p.startsWith('/auth/login')){signOut(true)}throw new Error(fmtErr(d)||r.statusText)}
+  return d}
+function toast(m,kind='error'){const t=$('#toast');t.className='toast-'+kind;t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,6000)}
+function askConfirmation({title,message,acceptLabel='Continue',requireDelete=false}){
+  const dialog=$('#confirmDialog');$('#confirmTitle').textContent=title;$('#confirmMessage').textContent=message;
+  $('#confirmAccept').textContent=acceptLabel;$('#confirmAccept').disabled=!!requireDelete;
+  $('#confirmPhraseWrap').hidden=!requireDelete;$('#confirmPhrase').value='';
+  if(confirmResolver)finishConfirmation(false);
+  return new Promise(resolve=>{confirmResolver=resolve;dialog.showModal();if(requireDelete)$('#confirmPhrase').focus();else $('#confirmAccept').focus()})
+}
+function finishConfirmation(confirmed){
+  if(!confirmResolver)return;
+  const done=confirmResolver;confirmResolver=null;
+  const dialog=$('#confirmDialog');if(dialog.open)dialog.close(confirmed?'confirm':'cancel');
+  done(confirmed);
+}
+$('#confirmDialog').addEventListener('cancel',e=>{e.preventDefault();finishConfirmation(false)});
+$('#confirmPhrase').addEventListener('input',e=>{$('#confirmAccept').disabled=e.target.value!=='DELETE'});
+function signOut(silent){token=user=sid=ws=rep=null;chat=[];mode='login';try{sessionStorage.removeItem('t')}catch(e){}draw();if(silent)toast('Session expired - please sign in again')}
+const F=e=>Object.fromEntries(new FormData(e.target));
+const pct=v=>v==null?'n/a':Math.round(v*10)/10;
+
+function draw(){
+  if(sharedToken){$('#who').innerHTML='';$('#app').innerHTML=sharedView();return}
+  const nav=user?`<nav>
+    <button data-a="nav" data-p="cases" class="${page==='cases'?'on':''}">Cases</button>
+    <button data-a="nav" data-p="profile" class="${page==='profile'?'on':''}">My profile</button>
+    ${user.is_admin?`<button data-a="nav" data-p="admin" class="${page==='admin'?'on':''}">Admin</button>`:''}
+    <button data-a="nav" data-p="privacy" class="${page==='privacy'?'on':''}">Privacy</button>
+  </nav>`:'';
+  $('#who').innerHTML=user?`${nav}<span class="userchip"><span>${esc(user.email)}</span><button data-a="out">Sign out</button></span>`:'';
+  if(!user){$('#app').innerHTML=authView();return}
+  if(sid){$('#app').innerHTML=rep?reportView():wsView();
+    if(!rep&&wsTab==='chat')requestAnimationFrame(()=>{const l=$('#chatLog');if(l)l.scrollTop=l.scrollHeight});
+    return}
+  if(page==='profile'){$('#app').innerHTML=profileView();return}
+  if(page==='admin'&&user.is_admin){$('#app').innerHTML=adminView();return}
+  if(page==='privacy'){$('#app').innerHTML=privacyView();return}
+  $('#app').innerHTML=casesView();
+}
+function authView(){
+  const reg=mode==='register';
+  const svg=d=>`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const mailIcon=svg('<path d="M4 4h16v16H4z"/><path d="m4 6 8 7 8-7"/>');
+  const lockIcon=svg('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>');
+  const check=svg('<path d="M20 6 9 17l-5-5"/>');
+  return `<div class="auth-shell"><div class="auth-grid">
+    <div class="auth-brand">
+      <div><div class="auth-mark">${svg('<circle cx="11" cy="11" r="6"/><path d="m20 20-3.2-3.2"/>')}</div>
+      <h1>Cognitive Research Agent</h1>
+      <p>Investigate realistic cases, test your own hypotheses, and get a scored report on how you actually reasoned - not just whether you got it right.</p></div>
+      <ul class="auth-points">
+        <li>${check}<span>Deterministic, explainable scoring - never an AI guessing your grade</span></li>
+        <li>${check}<span>Evidence-gated investigation, no spoilers</span></li>
+        <li>${check}<span>A skill profile that tracks you across cases</span></li>
+      </ul>
+    </div>
+    <div class="auth-panel">
+      <h2>${reg?'Create your account':'Welcome back'}</h2>
+      <p class="auth-sub">${reg?'Start investigating cases and building your reasoning profile.':'Sign in to continue your investigations.'}</p>
+      <div id="authErr" class="auth-err" hidden></div>
+      <form data-a="${mode}" novalidate autocomplete="on">
+        <div class="auth-field"><label for="authEmail">Email</label>
+          <div class="auth-input-wrap">${mailIcon}<input id="authEmail" class="f" name="email" type="email" placeholder="you@example.com" autocomplete="email" required></div></div>
+        <div class="auth-field"><label for="authPw">Password</label>
+          <div class="auth-input-wrap">${lockIcon}<input id="authPw" class="f" name="password" type="password" placeholder="${reg?'At least 8 characters':'Your password'}" minlength="8" autocomplete="${reg?'new-password':'current-password'}" required></div></div>
+        ${reg&&consent?`<div class="auth-consent"><p>${esc(consent.text)}</p>
+          <label><input type="checkbox" name="consent" required> I have read and agree to this data-use notice</label></div>`:''}
+        <button id="authSubmit" class="p auth-submit" type="submit">${reg?'Create account':'Sign in'}</button>
+      </form>
+      <div class="auth-switch">${reg
+        ?`Already have an account? <button type="button" data-a="mode">Sign in</button>`
+        :`New here? <button type="button" data-a="mode">Create an account</button>`}</div>
+    </div>
+  </div></div>`;
+}
+function searchIcon(){return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>`}
+function diffClass(d){d=(d||'').toLowerCase();return d==='easy'?'diff-easy':d==='hard'?'diff-hard':'diff-medium'}
+function latestSessionFor(caseId){
+  const s=mySessions.filter(x=>x.case_id===caseId);
+  if(!s.length)return null;
+  return s.slice().sort((a,b)=>(b.started_at||'').localeCompare(a.started_at||''))[0];
+}
+function filteredCases(){
+  let list=cases.slice();
+  const q=caseFilter.q.trim().toLowerCase();
+  if(q)list=list.filter(c=>(c.title||'').toLowerCase().includes(q)||(c.domain||'').toLowerCase().includes(q));
+  if(caseFilter.difficulty!=='all')list=list.filter(c=>(c.difficulty||'').toLowerCase()===caseFilter.difficulty);
+  const diffRank={easy:0,medium:1,hard:2};
+  list.sort((a,b)=>{
+    if(caseFilter.sort==='difficulty')return(diffRank[(a.difficulty||'').toLowerCase()]??1)-(diffRank[(b.difficulty||'').toLowerCase()]??1);
+    if(caseFilter.sort==='domain')return(a.domain||'').localeCompare(b.domain||'');
+    return(a.title||'').localeCompare(b.title||'');
+  });
+  return list;
+}
+function renderCaseCards(){
+  if(!casesLoaded)return `<div class="skel"></div><div class="skel"></div><div class="skel"></div>`;
+  if(!cases.length)return `<div class="empty-state"><p>No cases are available yet. Check back soon.</p></div>`;
+  const list=filteredCases();
+  if(!list.length)return `<div class="empty-state"><p>No cases match your search or filters.</p></div>`;
+  return list.map(c=>{
+    const s=latestSessionFor(c.case_id);
+    const statusTag=!s?'':`<span class="tag ${s.closed?'tag-done':'tag-progress'}">${s.closed?'Completed':'In progress'}</span>`;
+    const actionBtn=!s
+      ?`<button class="p case-cta" data-a="start" data-id="${esc(c.case_id)}">Start investigation</button>`
+      :!s.closed
+      ?`<button class="p case-cta" data-a="resume" data-id="${esc(s.session_id)}">Resume investigation</button>`
+      :`<button class="case-cta" data-a="resume" data-id="${esc(s.session_id)}">View report</button>`;
+    return `<div class="case-card">
+      <div class="case-card-top"><span class="tag ${diffClass(c.difficulty)}">${esc(c.difficulty)}</span>${statusTag}</div>
+      <h3>${esc(c.title)}</h3>
+      <div class="case-domain">${esc(c.domain)}</div>
+      <p class="case-overview">${esc(c.overview)}</p>
+      ${c.time_limit_minutes?`<div class="mu case-meta">&#9201; ${esc(c.time_limit_minutes)} min limit</div>`:''}
+      ${actionBtn}
+    </div>`;
+  }).join('');
+}
+function renderRecentActivity(){
+  if(!casesLoaded)return '<p class="mu">Loading...</p>';
+  if(!mySessions.length)return '<p class="mu">No investigations yet - start a case above.</p>';
+  const list=mySessions.slice().sort((a,b)=>(b.started_at||'').localeCompare(a.started_at||'')).slice(0,8);
+  return list.map(x=>{
+    const c=cases.find(cc=>cc.case_id===x.case_id);
+    return `<div class="activity-row"><div class="activity-main"><b>${esc(c?c.title:x.case_id)}</b> <span class="mu">${esc((x.started_at||'').slice(0,16).replace('T',' '))}</span></div>
+    <span class="tag ${x.closed?'tag-done':'tag-progress'}">${x.closed?'completed':'in progress'}</span>
+    <button data-a="resume" data-id="${esc(x.session_id)}">${x.closed?'View report':'Resume'}</button></div>`;
+  }).join('');
+}
+function renderGridOnly(){const el=$('#caseGrid');if(el)el.innerHTML=renderCaseCards()}
+function casesView(){
+  const completedCount=mySessions.filter(x=>x.closed).length;
+  const progressCount=mySessions.filter(x=>!x.closed).length;
+  const scored=(profileData&&profileData.history||[]).filter(h=>h.final_score!=null);
+  const avg=scored.length?Math.round(scored.reduce((a,h)=>a+h.final_score,0)/scored.length):null;
+  const name=user&&user.email?esc(user.email.split('@')[0]):'';
+  return `<div class="welcome">
+    <div><h1>Welcome back${name?', '+name:''}</h1><p class="mu">Pick up where you left off, or start a new investigation.</p></div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-num">${casesLoaded?cases.length:'-'}</div><div class="stat-label">Cases available</div></div>
+      <div class="stat-card"><div class="stat-num">${casesLoaded?progressCount:'-'}</div><div class="stat-label">In progress</div></div>
+      <div class="stat-card"><div class="stat-num">${casesLoaded?completedCount:'-'}</div><div class="stat-label">Completed</div></div>
+      <div class="stat-card"><div class="stat-num">${casesLoaded?(avg==null?'n/a':avg):'-'}</div><div class="stat-label">Avg. score</div></div>
+    </div>
+  </div>
+  <div class="dash-toolbar">
+    <div class="search-wrap">${searchIcon()}<input id="caseSearch" placeholder="Search cases by title or domain" value="${esc(caseFilter.q)}"></div>
+    <select id="caseDifficulty">
+      <option value="all" ${caseFilter.difficulty==='all'?'selected':''}>All difficulties</option>
+      <option value="easy" ${caseFilter.difficulty==='easy'?'selected':''}>Easy</option>
+      <option value="medium" ${caseFilter.difficulty==='medium'?'selected':''}>Medium</option>
+      <option value="hard" ${caseFilter.difficulty==='hard'?'selected':''}>Hard</option>
+    </select>
+    <select id="caseSort">
+      <option value="title" ${caseFilter.sort==='title'?'selected':''}>Sort: Title</option>
+      <option value="difficulty" ${caseFilter.sort==='difficulty'?'selected':''}>Sort: Difficulty</option>
+      <option value="domain" ${caseFilter.sort==='domain'?'selected':''}>Sort: Domain</option>
+    </select>
+  </div>
+  <div id="caseGrid" class="grid">${renderCaseCards()}</div>
+  <h2 class="section-title">Recent activity</h2>
+  <div id="mine">${renderRecentActivity()}</div>`;
+}
+function trendLabel(t){return t==='improving'?'↑ Improving':t==='needs_focus'?'↓ Needs focus':t==='steady'?'→ Steady':'Not enough data'}
+function sparkline(history){
+  if(!history||history.length<2)return '';
+  const w=90,h=28,min=Math.min(...history),max=Math.max(...history),range=(max-min)||1;
+  const pts=history.map((v,i)=>[i/(history.length-1)*w,h-((v-min)/range)*h*0.86-2]);
+  const d=pts.map((pp,i)=>(i===0?'M':'L')+pp[0].toFixed(1)+','+pp[1].toFixed(1)).join(' ');
+  const last=pts[pts.length-1];
+  return `<svg class="skill-sparkline" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path class="spark-line" d="${d}"></path><circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.5"></circle></svg>`;
+}
+function profileView(){
+  if(profileLoadError)return `<div class="card"><h2>My profile</h2><div class="empty-state"><p>${esc(profileLoadError)}</p><button data-a="nav" data-p="profile">Try again</button></div></div>`;
+  const p=profileData;
+  if(!p)return `<div class="card"><h2>My profile</h2><div class="skel" style="height:220px"></div></div>`;
+  const skillNames=Object.keys(p.skills);
+  const overallAvg=skillNames.length?Math.round(skillNames.reduce((s,k)=>s+p.skills[k].average,0)/skillNames.length):null;
+  const completionPct=p.cases_attempted?Math.round(p.cases_completed/p.cases_attempted*100):0;
+  const skillCards=skillNames.length?skillNames.map(k=>{
+    const v=p.skills[k],band=skillBand(v.average);
+    return `<div class="skill-row">
+    <div class="skill-card-row"><span class="skill-name">${esc(k.replace(/_/g,' '))}</span><span class="skill-score band-${band}">${v.average}/100</span></div>
+    <div class="skill-bar"><div class="skill-bar-fill band-${band}" style="width:${v.average}%"></div></div>
+    <div class="skill-card-row"><span class="trend-badge trend-${v.trend||'none'}">${esc(trendLabel(v.trend))}</span>${sparkline(v.history)}</div>
+    <div class="skill-meta">Assessed in ${v.cases_assessed} case${v.cases_assessed===1?'':'s'}</div>
+    </div>`;
+  }).join(''):'<div class="empty-state"><p>Complete a case to start building your cognitive profile.</p></div>';
+  const histRows=p.history.length?p.history.slice().reverse().map(h=>{
+    const statusCls=h.status==='solved'?'tag-done':h.status==='partially_solved'?'diff-medium':'diff-hard';
+    return `<tr><td><b>${esc(h.title)}</b></td><td><span class="tag ${statusCls}">${esc(h.status.replace(/_/g,' '))}</span></td>
+    <td>${h.final_score??'n/a'}</td><td class="mu">${esc((h.completed_at||'').slice(0,16).replace('T',' '))}</td>
+    <td><button data-a="resume" data-id="${esc(h.session_id)}">View report</button></td></tr>`;
+  }).join(''):'<tr><td colspan="5" class="mu">No completed cases yet.</td></tr>';
+  const recHtml=profileLatestRecLoading?'<p class="mu">Loading...</p>'
+    :profileLatestRecError?`<p class="mu">${esc(profileLatestRecError)}</p>`
+    :profileLatestRec&&profileLatestRec.items.length?`<p class="rec-source-note">Based on your most recently completed case: ${esc(profileLatestRec.title)}</p><ul class="insight-list">${profileLatestRec.items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`
+    :profileLatestRec?'<p class="mu">No specific development recommendations from your most recent case.</p>'
+    :'<p class="mu">Complete a case to get development recommendations.</p>';
+  return `<div class="card">
+    <div class="profile-header">
+      <div><h1>My cognitive profile</h1><p class="mu">How you investigate, reason, and improve across cases.</p></div>
+      <div class="profile-stat-row">
+        <div class="stat-card"><div class="stat-num">${p.cases_attempted}</div><div class="stat-label">Cases attempted</div></div>
+        <div class="stat-card"><div class="stat-num">${p.cases_completed}</div><div class="stat-label">Cases completed</div></div>
+        <div class="stat-card"><div class="stat-num">${completionPct}%</div><div class="stat-label">Completion rate</div></div>
+        <div class="stat-card"><div class="stat-num">${overallAvg??'n/a'}</div><div class="stat-label">Avg skill score</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="grid profile-grid">
+    <div class="card"><h2>Skill breakdown &amp; progression</h2>${skillCards}</div>
+    <div class="card"><h2>Behavioral patterns</h2>${p.behavioral_patterns.length?`<ul class="insight-list">${p.behavioral_patterns.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p class="mu">Not enough data yet - complete a couple more cases to surface patterns.</p>'}</div>
+    <div class="card insight-card insight-recommend"><h2>Recommended development</h2>${recHtml}</div>
+  </div>
+  <div class="card"><h2>Case history</h2><div class="history-table-wrap"><table class="history-table"><tr><th>Case</th><th>Status</th><th>Score</th><th>Completed</th><th></th></tr>${histRows}</table></div></div>
+  <p class="mu report-notice">${esc(p.notice)}</p>`;
+}
+function adminStatBlock(a){
+  const cases=Object.values(a.per_case);
+  const totalCompleted=cases.reduce((s,c)=>s+c.completed,0);
+  const totalAttempts=cases.reduce((s,c)=>s+c.attempts,0);
+  const solvedWeighted=cases.reduce((s,c)=>s+(c.solve_rate!=null?c.solve_rate*c.completed:0),0);
+  const overallSolveRate=totalCompleted?Math.round(solvedWeighted/totalCompleted*100):null;
+  const scored=cases.filter(c=>c.avg_final_score!=null&&c.completed);
+  const scoredCompleted=scored.reduce((s,c)=>s+c.completed,0);
+  const overallAvgScore=scoredCompleted?Math.round(scored.reduce((s,c)=>s+c.avg_final_score*c.completed,0)/scoredCompleted):null;
+  return `<div class="stat-row">
+    <div class="stat-card"><div class="stat-num">${a.total_users}</div><div class="stat-label">Total users</div></div>
+    <div class="stat-card"><div class="stat-num">${a.total_sessions}</div><div class="stat-label">Total investigations</div></div>
+    <div class="stat-card"><div class="stat-num">${totalCompleted}/${totalAttempts}</div><div class="stat-label">Completed / started</div></div>
+    <div class="stat-card"><div class="stat-num">${overallSolveRate==null?'n/a':overallSolveRate+'%'}</div><div class="stat-label">Overall solve rate</div></div>
+    <div class="stat-card"><div class="stat-num">${overallAvgScore??'n/a'}</div><div class="stat-label">Avg final score</div></div>
+  </div>`;
+}
+function filteredAnalyticsRows(){
+  if(!analytics)return [];
+  let rows=Object.entries(analytics.per_case).map(([id,v])=>({id,...v}));
+  const q=adminAnalyticsFilter.q.trim().toLowerCase();
+  if(q)rows=rows.filter(r=>r.id.toLowerCase().includes(q)||r.title.toLowerCase().includes(q));
+  const key=adminAnalyticsFilter.sort;
+  rows.sort((a,b)=>{
+    if(key==='title')return a.title.localeCompare(b.title);
+    if(key==='solve_rate')return (b.solve_rate??-1)-(a.solve_rate??-1);
+    if(key==='avg_final_score')return (b.avg_final_score??-1)-(a.avg_final_score??-1);
+    return b.attempts-a.attempts;
+  });
+  return rows;
+}
+function renderAnalyticsTable(){
+  if(!analytics)return `<div class="stat-row">${[0,1,2].map(()=>'<div class="skel" style="height:50px;flex:1"></div>').join('')}</div>`;
+  const rows=filteredAnalyticsRows();
+  if(!rows.length)return `<div class="empty-state"><p>${Object.keys(analytics.per_case).length?'No cases match your search.':'No investigations have been started yet.'}</p></div>`;
+  return `<div class="history-table-wrap"><table class="admin-analytics-table">
+  <tr><th data-a="admin-sort" data-k="title">Case</th><th data-a="admin-sort" data-k="attempts">Attempts</th><th>Completed</th><th data-a="admin-sort" data-k="solve_rate">Solve rate</th><th data-a="admin-sort" data-k="avg_final_score">Avg score</th><th>Avg time (s)</th></tr>
+  ${rows.map(r=>`<tr><td><b>${esc(r.title)}</b> <span class="admin-case-id">${esc(r.id)}</span></td><td>${r.attempts}</td><td>${r.completed}</td>
+  <td>${r.solve_rate==null?'n/a':Math.round(r.solve_rate*100)+'%'}</td><td>${r.avg_final_score??'n/a'}</td><td>${r.avg_time_to_conclusion_s??'n/a'}</td></tr>`).join('')}
+  </table></div>`;
+}
+function renderAnalyticsOnly(){const el=$('#adminAnalyticsTable');if(el)el.innerHTML=renderAnalyticsTable()}
+function filteredAdminCases(){
+  let list=(adminCases||[]).slice();
+  const q=adminCaseFilter.q.trim().toLowerCase();
+  if(q)list=list.filter(c=>(c.case_id||'').toLowerCase().includes(q)||(c.title||'').toLowerCase().includes(q));
+  return list.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
+}
+function renderAdminCaseList(){
+  if(!adminCases)return `<div class="skel" style="height:120px"></div>`;
+  const list=filteredAdminCases();
+  if(!list.length)return `<div class="empty-state"><p>${adminCases.length?'No cases match your search.':'No cases authored yet. Use the Author tab to add one.'}</p></div>`;
+  return list.map(c=>`<div class="admin-case-row">
+  <div class="admin-case-main"><span class="admin-case-id">${esc(c.case_id)}</span><b>${esc(c.title)}</b>
+  ${c.difficulty?`<span class="tag ${diffClass(c.difficulty)}">${esc(c.difficulty)}</span>`:''}${c.domain?`<span class="tag">${esc(c.domain)}</span>`:''}</div>
+  <button data-a="admin-load" data-id="${esc(c.case_id)}">Load into editor</button>
+  <button data-a="admin-del" data-id="${esc(c.case_id)}" style="border-color:var(--bad);color:var(--bad)">Delete</button>
+  </div>`).join('');
+}
+function renderAdminCaseListOnly(){const el=$('#adminCaseList');if(el)el.innerHTML=renderAdminCaseList()}
+function adminTabsHtml(){
+  const tabs=[['analytics','Overview'],['cases','Case management'],['author','Author / edit']];
+  return `<div class="admin-tabs">${tabs.map(([k,label])=>`<button class="admin-tab ${adminTab===k?'on':''}" data-a="admin-tab" data-t="${k}">${esc(label)}</button>`).join('')}</div>`;
+}
+function adminAnalyticsTabHtml(){
+  if(adminLoadError)return `<div class="card"><div class="empty-state"><p>${esc(adminLoadError)}</p><button data-a="nav" data-p="admin">Try again</button></div></div>`;
+  return `<div class="card">${analytics?adminStatBlock(analytics):'<div class="stat-row">'+[0,1,2,3,4].map(()=>'<div class="skel" style="height:64px;flex:1"></div>').join('')+'</div>'}</div>
+  <div class="card"><div class="dash-toolbar">
+  <div class="search-wrap">${searchIcon()}<input id="adminAnalyticsSearch" placeholder="Search cases by title or id" value="${esc(adminAnalyticsFilter.q)}"></div>
+  <select id="adminAnalyticsSort">
+  <option value="attempts" ${adminAnalyticsFilter.sort==='attempts'?'selected':''}>Sort: Most attempts</option>
+  <option value="title" ${adminAnalyticsFilter.sort==='title'?'selected':''}>Sort: Title</option>
+  <option value="solve_rate" ${adminAnalyticsFilter.sort==='solve_rate'?'selected':''}>Sort: Solve rate</option>
+  <option value="avg_final_score" ${adminAnalyticsFilter.sort==='avg_final_score'?'selected':''}>Sort: Avg score</option>
+  </select></div>
+  <div id="adminAnalyticsTable">${renderAnalyticsTable()}</div></div>`;
+}
+function adminCasesTabHtml(){
+  if(adminLoadError)return `<div class="card"><div class="empty-state"><p>${esc(adminLoadError)}</p><button data-a="nav" data-p="admin">Try again</button></div></div>`;
+  return `<div class="card"><div class="dash-toolbar"><div class="search-wrap">${searchIcon()}<input id="adminCaseSearch" placeholder="Search authored cases" value="${esc(adminCaseFilter.q)}"></div></div>
+  <div id="adminCaseList">${renderAdminCaseList()}</div></div>`;
+}
+function adminAuthorTabHtml(){
+  return `<div class="card"><h2>Author / edit a case</h2>
+  <p class="mu">Paste a full case JSON document. Use <b>Create new</b> for a case_id that doesn't exist yet, or <b>Update existing</b> to overwrite one (load it first from the Case management tab).</p>
+  <form data-a="admin-save"><textarea name="json" class="admin-json-area" required>${esc(caseDraft)}</textarea>
+  <div class="admin-form-actions"><button class="p" data-mode="create">Create new</button><button data-mode="update">Update existing</button></div></form>
+  <div class="admin-form-actions"><button type="button" data-a="admin-clear">Clear</button></div></div>`;
+}
+function adminContentHtml(){
+  if(adminTab==='cases')return adminCasesTabHtml();
+  if(adminTab==='author')return adminAuthorTabHtml();
+  return adminAnalyticsTabHtml();
+}
+function adminView(){
+  return `<div class="card"><h1 style="margin:0 0 4px;font-size:21px">Admin dashboard</h1><p class="mu" style="margin:0">Platform-wide analytics and case authoring.</p></div>
+  ${adminTabsHtml()}
+  <div id="adminContent">${adminContentHtml()}</div>`;
+}
+function privacyView(){
+  const notice=privacyNotice;
+  const exportStatus=privacyExportState==='loading'?'Preparing your account export…':privacyExportState==='success'?'Your JSON export has been downloaded.':privacyExportState==='error'?privacyExportError:'';
+  return `<section class="privacy-hero"><div><h1>Privacy &amp; your data</h1><p>See what this account stores, download your investigation history, or permanently erase the account.</p></div><div class="privacy-mark"><span aria-hidden="true">&#10003;</span> Account controls</div></section>
+  ${privacyLoadError?`<div class="card"><p class="bad">${esc(privacyLoadError)}</p><button data-a="privacy-retry">Retry</button></div>`:!notice?`<div class="card"><div class="skel" style="height:110px"></div></div>`:`<div class="privacy-grid">
+    <section class="card privacy-panel privacy-account"><h2>Account record</h2><p class="mu">The account is associated with this sign-in address.</p><p><b>${esc(user.email)}</b></p><p class="mu">Consent record and activity details are included in your export.</p></section>
+    <section class="card privacy-panel"><h2>Stored data</h2><p class="mu">${esc(notice.what_is_tracked)}</p><ul class="privacy-data-list"><li>Credentials are never included in the export.</li><li>Other users’ account and investigation data are not included.</li></ul></section>
+    <section class="card privacy-panel"><h2>Download your data</h2><p class="mu">Export your account record, timestamped investigation events, and available completed-case reports as a JSON file.</p><div class="privacy-action"><span class="mu">Private to your authenticated account</span><button class="p" data-a="privacy-export" ${privacyExportState==='loading'?'disabled':''}>${privacyExportState==='loading'?'<span class="auth-spin"></span> Preparing…':'Download JSON export'}</button></div><div class="privacy-status ${privacyExportState==='error'?'status-error':privacyExportState==='success'?'status-success':''}" role="status" aria-live="polite">${esc(exportStatus)}</div></section>
+    <section class="card privacy-panel privacy-danger"><h2>Delete account and data</h2><p class="mu">This permanently removes your account, sign-in tokens, investigation history, and its share links. This cannot be undone.</p><div class="privacy-action"><span class="mu">You will be signed out immediately</span><button data-a="privacy-delete" ${privacyDeleteBusy?'disabled':''}>${privacyDeleteBusy?'Deleting…':'Delete account'}</button></div></section>
+    <section class="card privacy-panel privacy-consent"><h2>Consent information</h2><p class="mu">Current notice version: ${esc(notice.consent_version)}. Your recorded consent version and timestamp are included in your export. Current notice text:</p><blockquote>${esc(notice.consent_text)}</blockquote></section>
+  </div>`}`;
+}
+function sharePanelHtml(){
+  if(!shareUrl||shareSessionId!==sid)return '';
+  return `<div class="card"><h2>Read-only link ready</h2><p class="mu">Anyone who has this link can view the shared snapshot without signing in. It does not allow edits.</p><div class="share-url-row"><input id="shareUrl" value="${esc(shareUrl)}" readonly aria-label="Read-only share link"><button data-a="share-copy">Copy link</button><button data-a="share-revoke">Revoke link</button></div><p class="share-permission">Revoking removes every active share link for this investigation.</p></div>`;
+}
+function sharedView(){
+  if(sharedLoading)return `<div class="shared-shell"><div class="privacy-hero"><div><h1>Shared investigation</h1><p>Loading the read-only investigation snapshot…</p></div></div><div class="card"><div class="skel" style="height:190px"></div></div></div>`;
+  if(sharedError)return `<div class="shared-shell"><section class="shared-hero"><h1>Shared investigation unavailable</h1><p>This link may have expired, been revoked, or may not be valid.</p></section><div class="empty-state"><p>${esc(sharedError)}</p></div></div>`;
+  if(!sharedData)return '';
+  const d=sharedData,c=d.case||{};
+  const ev=d.evidence||[],hy=d.hypotheses||[],notes=d.notes||[],links=d.links||[],flags=d.contradictions_flagged||[];
+  const evidenceHtml=ev.length?ev.map(x=>`<article class="shared-evidence"><div class="ev-card-top"><span class="ev-type-badge">${esc((x.type||'evidence').replace(/_/g,' '))}</span><span class="tag">${esc(x.id)}</span></div><h3>${esc(x.title)}</h3><p>${esc(x.content)}</p></article>`).join(''):'<p class="mu">No evidence has been shared in this snapshot.</p>';
+  const hypothesisHtml=hy.length?hy.map(x=>`<article class="shared-evidence"><div class="ev-card-top"><b>${esc(x.id)}</b><span class="tag hyp-status-${esc(x.status)}">${esc(x.status)}</span></div><p>${esc(x.statement)}</p><p class="mu">Confidence ${Math.round((x.confidence||0)*100)}%</p></article>`).join(''):'<p class="mu">No hypotheses in this snapshot.</p>';
+  const linkHtml=links.length?`<div class="shared-links">${links.map(x=>`<span class="tag">${esc(x.evidence_id)} ${esc(x.relation)} ${esc(x.hypothesis_id)}</span>`).join('')}</div>`:'<p class="mu">No evidence links in this snapshot.</p>';
+  const flagHtml=flags.length?`<div class="shared-links">${flags.map(x=>`<span class="tag diff-hard">${esc(x[0])} vs ${esc(x[1])}</span>`).join('')}</div>`:'<p class="mu">No flagged contradictions in this snapshot.</p>';
+  const report=d.report?(()=>{const p=d.report.performance||{};const metrics=[['Outcome',p.outcome],['Reasoning',p.reasoning],['Process',p.process]];
+    return `<section class="card"><h2>Cognitive report</h2><div class="shared-report-score">${p.final??'n/a'}<span class="mu"> / 100</span></div><p><span class="tag">${esc((d.report.status||'').replace(/_/g,' '))}</span></p><div class="shared-report-grid">${metrics.map(([label,value])=>`<div class="shared-report-metric"><b>${value==null?'n/a':esc(value)}</b>${esc(label)}<div class="shared-report-track"><div class="shared-report-fill" style="width:${Math.max(0,Math.min(100,Number(value)||0))}%"></div></div></div>`).join('')}</div><p class="mu" style="margin-top:14px">${esc(d.report.notice||'')}</p></section>`})():'';
+  return `<div class="shared-shell"><section class="shared-hero"><h1>${esc(c.title||'Shared investigation')}</h1><p>${esc(c.overview||'')}</p><div class="row"><span class="tag">${esc(c.domain||'Investigation')}</span><span class="tag">${d.closed?'Completed':'In progress'}</span></div></section>
+    <div class="shared-banner"><span aria-hidden="true">&#128274;</span><span><b>Read-only shared view</b>This snapshot can be viewed by anyone with this link. It does not provide access to the owner’s account or allow changes.</span></div>
+    <div class="shared-grid"><section class="card"><h2>Discovered evidence <span class="tag">${ev.length}</span></h2>${evidenceHtml}</section><section class="card"><h2>Hypotheses <span class="tag">${hy.length}</span></h2>${hypothesisHtml}</section>
+    <section class="card"><h2>Evidence links</h2>${linkHtml}<h3>Flagged contradictions</h3>${flagHtml}</section><section class="card"><h2>Investigation notes</h2>${notes.length?notes.map(n=>`<article class="shared-evidence"><p>${esc(n)}</p></article>`).join(''):'<p class="mu">No notes in this snapshot.</p>'}</section>${report}</div></div>`;
+}
+function byIdTitle(id){const e=ws.evidence.find(x=>x.id===id);return e?`${id} - ${e.title}`:id}
+function evOptions(){return ws.evidence.map(e=>`<option value="${esc(e.id)}">${esc(e.id)} - ${esc(e.title)}</option>`).join('')}
+function wsProgress(){const total=ws.evidence.length||1,opened=ws.viewed.length;return{pct:Math.round(opened/total*100),opened,total}}
+function wsHeaderHtml(){
+  const c=ws.case,pr=wsProgress();
+  return `<div class="card ws-header">
+    <div class="ws-header-top"><button data-a="home">&larr; Cases</button>
+    <div class="ws-header-actions"><button data-a="share">Share read-only link</button></div></div>
+    <h2 class="ws-title">${esc(c.title)}</h2>
+    <p class="ws-overview">${esc(c.overview)}</p>
+    <div class="ws-objective"><b>Objective</b><span>${esc(c.objective)}</span></div>
+    <div class="ws-progress"><div class="ws-progress-bar"><div class="ws-progress-fill" style="width:${pr.pct}%"></div></div>
+    <span class="mu">${pr.opened}/${pr.total} evidence reviewed &middot; ${ws.hypotheses.length} hypotheses &middot; ${ws.contradictions_flagged.length} contradictions flagged</span></div>
+  </div>`;
+}
+function wsTabsHtml(){
+  const tabs=[['evidence','Evidence',ws.evidence.length],['chat','Investigator',null],['hyp','Hypotheses',ws.hypotheses.length],
+    ['notes','Notes',ws.notes.length],['timeline','Timeline',wsActivity.length],['graph','Knowledge Graph',null]];
+  return `<div class="ws-tabs">${tabs.map(([k,label,n])=>`<button class="ws-tab ${wsTab===k?'on':''}" data-a="wstab" data-t="${k}">${esc(label)}${n!=null?`<span class="ws-tab-badge">${n}</span>`:''}</button>`).join('')}</div>`;
+}
+function filteredEvidence(){
+  let list=ws.evidence.slice();const q=evFilter.q.trim().toLowerCase();
+  if(q)list=list.filter(e=>e.title.toLowerCase().includes(q)||e.type.toLowerCase().includes(q));
+  if(evFilter.onlyUnopened)list=list.filter(e=>!ws.viewed.includes(e.id));
+  return list;
+}
+function renderEvidenceGrid(){
+  const list=filteredEvidence();
+  if(!list.length)return `<div class="empty-state"><p>No evidence matches your search or filter.</p></div>`;
+  return list.map(e=>{
+    const opened=ws.viewed.includes(e.id),m=ws.relevance_marks[e.id];
+    return `<div class="ev-card ${opened?'ev-opened':'ev-locked'}">
+    <div class="ev-card-top"><span class="ev-type-badge">${esc(e.type.replace(/_/g,' '))}</span>${opened?'<span class="tag tag-done">Opened</span>':'<span class="tag">Unopened</span>'}</div>
+    <h3>${esc(e.title)}</h3>
+    ${opened?`<p class="ev-content">${esc(e.content)}</p>`:`<p class="mu ev-locked-msg">Open this item to reveal its contents.</p><button data-a="view" data-id="${esc(e.id)}" ${ws.closed?'disabled':''}>Open evidence</button>`}
+    ${opened?`<div class="ev-relevance"><span class="mu">Relevance:</span>
+    <button data-a="rel" data-id="${esc(e.id)}" data-v="1" class="${m===true?'p':''}" ${ws.closed?'disabled':''}>Relevant</button>
+    <button data-a="rel" data-id="${esc(e.id)}" data-v="0" class="${m===false?'p':''}" ${ws.closed?'disabled':''}>Not relevant</button></div>`:''}
+    </div>`;
+  }).join('');
+}
+function renderEvGridOnly(){const el=$('#evGrid');if(el)el.innerHTML=renderEvidenceGrid()}
+function evidenceTabHtml(){
+  return `<div class="dash-toolbar">
+    <div class="search-wrap">${searchIcon()}<input id="evSearch" placeholder="Search evidence by title or type" value="${esc(evFilter.q)}"></div>
+    <label class="ev-toggle"><input type="checkbox" id="evOnlyUnopened" ${evFilter.onlyUnopened?'checked':''}> Unopened only</label>
+  </div>
+  <div id="evGrid" class="grid ev-grid">${renderEvidenceGrid()}</div>
+  ${ws.contradictions_flagged.length?`<div class="card contradiction-card"><h3>&#9889; Flagged contradictions</h3>${ws.contradictions_flagged.map(p=>`<div class="contradiction-row"><span class="tag diff-hard">contradiction</span> ${esc(byIdTitle(p[0]))} <span class="mu">vs</span> ${esc(byIdTitle(p[1]))}</div>`).join('')}</div>`:''}
+  <div class="card"><h3>Flag a contradiction</h3><form data-a="flag" class="row"><select class="f" name="a">${evOptions()}</select><span class="mu">vs</span><select class="f" name="b">${evOptions()}</select><button ${ws.closed?'disabled':''}>Flag contradiction</button></form></div>`;
+}
+function chatEmptyHtml(){
+  return `<div class="empty-state chat-empty"><p>Ask about people, documents, logs, timelines...</p>
+    <div class="chat-suggestions">${CHAT_SUGGESTIONS.map(s=>`<button type="button" class="chat-suggestion" data-a="suggest" data-q="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+  </div>`;
+}
+function chatTabHtml(){
+  const msgs=chat.filter(x=>x.sid===sid);
+  const html=msgs.length?msgs.map(x=>{
+    const refs=x.evidence&&x.evidence.length
+      ?`<div class="chat-evidence-refs">${x.evidence.map(e=>`<button type="button" class="chat-ev-chip" data-a="chat-ev" data-id="${esc(e.id)}">&#128206; ${esc(e.id)} - ${esc(e.title)}</button>`).join('')}</div>`:'';
+    return `<div class="chat-msg chat-user"><div class="chat-bubble">${esc(x.q)}</div></div>
+    <div class="chat-msg chat-ai"><div class="chat-avatar">AI</div><div class="chat-ai-body"><div class="chat-bubble">${esc(x.a)}</div>${refs}</div></div>`;
+  }).join(''):chatEmptyHtml();
+  const errHtml=chatError?`<div class="chat-msg chat-ai"><div class="chat-avatar">AI</div><div class="chat-ai-body"><div class="chat-bubble chat-error">${esc(chatError)}</div></div></div>`:'';
+  const thinking=chatThinking?`<div class="chat-msg chat-ai"><div class="chat-avatar">AI</div><div class="chat-ai-body"><div class="chat-bubble chat-thinking"><span></span><span></span><span></span><em>Investigating…</em></div></div></div>`:'';
+  return `<div class="card chat-card">
+    <div class="chat-identity"><span class="chat-identity-dot"></span><b>AI Investigator</b><span class="mu">Answers using only this case's evidence - it won't reveal the solution</span></div>
+    <div id="chatLog" class="chat-log">${html}${errHtml}${thinking}</div>
+    <form data-a="ask" class="row chat-input-row"><input class="f" id="chatInput" name="text" placeholder="e.g. Interview the postdoc" required ${ws.closed||chatThinking?'disabled':''} autocomplete="off"><button class="p" ${ws.closed||chatThinking?'disabled':''}>Ask</button></form>
+  </div>`;
+}
+function hypTabHtml(){
+  const opts=evOptions();
+  const hypHtml=ws.hypotheses.length?ws.hypotheses.map(h=>{
+    const ls=ws.links.filter(l=>l.hypothesis_id===h.id);
+    return `<div class="hyp-card">
+    <div class="hyp-card-top"><b>${esc(h.id)}</b><span class="tag hyp-status-${esc(h.status)}">${esc(h.status)}</span></div>
+    <p class="hyp-statement">${esc(h.statement)}</p>
+    <div class="row"><span class="mu">Confidence ${Math.round(h.confidence*100)}%</span>
+    <input class="f" type="range" min="0" max="100" value="${Math.round(h.confidence*100)}" data-a="conf" data-id="${esc(h.id)}" ${ws.closed?'disabled':''}>
+    <select data-a="status" data-id="${esc(h.id)}" ${ws.closed?'disabled':''}>${['active','supported','refuted','abandoned'].map(s=>`<option ${s===h.status?'selected':''}>${s}</option>`).join('')}</select></div>
+    ${ls.length?`<div class="hyp-links">${ls.map(l=>`<span class="tag ${l.relation==='supports'?'tag-done':'diff-hard'}">${esc(l.relation)} ${esc(l.evidence_id)}</span>`).join('')}</div>`:''}
+    ${ws.closed?'':`<form data-a="link" data-id="${esc(h.id)}" class="row"><select class="f" name="e">${opts}</select>
+    <select name="r"><option>supports</option><option>contradicts</option></select><button>Link evidence</button></form>`}</div>`;
+  }).join(''):'<div class="empty-state"><p>No hypotheses yet. State one below based on what you\'ve found so far.</p></div>';
+  return `<div class="card"><h3>Your hypotheses</h3><div class="hyp-grid">${hypHtml}</div></div>
+  ${ws.closed?'':`<div class="card"><h3>State a new hypothesis</h3><form data-a="hyp"><textarea name="statement" placeholder="e.g. 'X did Y because Z'" required></textarea>
+  <div class="row"><span class="mu">Confidence</span><input class="f" type="range" name="c" min="0" max="100" value="50"><button class="p">Add hypothesis</button></div></form></div>`}
+  ${ws.closed?'':`<div class="card conclude-card"><h3>Submit final conclusion</h3><p class="mu">This locks the investigation - you cannot change it afterwards.</p>
+  <form data-a="conclude"><textarea name="text" placeholder="Who/what/why, in your own words" required></textarea>
+  <div class="row"><span class="mu">Confidence</span><input class="f" type="range" name="c" min="0" max="100" value="70"></div>
+  <div class="mu">Cite supporting evidence:</div><div class="cite-grid">${ws.evidence.map(e=>`<label class="row cite-item"><input type="checkbox" name="cite" value="${esc(e.id)}" style="width:auto"> ${esc(e.id)} ${esc(e.title)}</label>`).join('')}</div>
+  <button class="p">Submit final conclusion</button></form></div>`}`;
+}
+function notesTabHtml(){
+  return `<div class="card"><h3>Notes</h3>${ws.notes.length?`<div class="notes-list">${ws.notes.map(n=>`<div class="note-item">${esc(n)}</div>`).join('')}</div>`:'<p class="mu">No notes yet.</p>'}
+  ${ws.closed?'':`<form data-a="note" class="row"><textarea class="f" name="text" placeholder="Take a note" required></textarea><button class="p">Add note</button></form>`}</div>`;
+}
+function timeAgo(ts){const s=Math.round((Date.now()-ts)/1000);if(s<5)return 'just now';if(s<60)return s+'s ago';const m=Math.round(s/60);if(m<60)return m+'m ago';return Math.round(m/60)+'h ago'}
+function activityIcon(a){return{ask:'?',view:'E',rel:'R',hyp:'H',link:'L',flag:'!',note:'N',conclude:'F',open:'O'}[a]||'*'}
+function logActivity(action,label){wsActivity.push({t:Date.now(),action,label})}
+function timelineTabHtml(){
+  if(!wsActivity.length)return `<div class="card"><div class="empty-state"><p>No activity recorded yet this session. Actions you take here - asking questions, opening evidence, forming hypotheses - will appear here as you investigate.</p></div></div>`;
+  const items=wsActivity.slice().reverse().map(a=>`<div class="timeline-row"><span class="timeline-icon">${activityIcon(a.action)}</span><div class="timeline-body"><div>${esc(a.label)}</div><span class="mu">${timeAgo(a.t)}</span></div></div>`).join('');
+  return `<div class="card"><h3>This session's activity</h3><p class="mu">Recorded locally in this browser tab since you opened the case.</p><div class="timeline-list">${items}</div></div>`;
+}
+function graphBodyHtml(){
+  if(wsGraphLoading)return `<div class="graph-loading"><span class="auth-spin graph-spin"></span><span class="mu">Loading knowledge graph...</span></div>`;
+  if(wsGraphError)return `<div class="empty-state"><p>${esc(wsGraphError)}</p><button data-a="graph-refresh">Try again</button></div>`;
+  if(!wsGraph)return `<div class="empty-state"><p>Loading...</p></div>`;
+  if(!wsGraph.nodes.length)return `<div class="empty-state"><p>No evidence or hypotheses yet - start investigating to build the graph.</p></div>`;
+  return renderGraphSvg(wsGraph);
+}
+function renderGraphSvg(g){
+  const evNodes=g.nodes.filter(n=>n.kind==='evidence'),hyNodes=g.nodes.filter(n=>n.kind==='hypothesis');
+  const colW=170,topY=55,botY=255,pad=90;
+  const width=Math.max(620,pad*2+colW*Math.max(evNodes.length,hyNodes.length,1));
+  const height=320;
+  const pos={};
+  evNodes.forEach((n,i)=>{pos[n.id]={x:pad+colW*i+colW/2,y:topY}});
+  hyNodes.forEach((n,i)=>{pos[n.id]={x:pad+colW*i+colW/2,y:botY}});
+  const edgesSvg=g.edges.map((e,idx)=>{
+    const a=pos[e.source],b=pos[e.target];if(!a||!b)return '';
+    const cls=e.relation==='supports'?'edge-supports':e.relation==='contradicts'?'edge-contradicts':'edge-flag';
+    const midx=(a.x+b.x)/2,midy=(a.y+b.y)/2-6;
+    return `<g class="graph-edge ${cls}"><line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" marker-end="url(#arrow-${cls})"></line>
+    <text x="${midx}" y="${midy}" class="edge-label">${esc(e.relation.replace(/_/g,' '))}</text></g>`;
+  }).join('');
+  const nodeSvg=g.nodes.map(n=>{
+    const p=pos[n.id];if(!p)return '';
+    const isHyp=n.kind==='hypothesis';
+    const maxLen=isHyp?22:14;
+    const label=(n.label||'').length>maxLen?n.label.slice(0,maxLen-1)+'\u2026':(n.label||'');
+    const statusCls=isHyp?` node-status-${esc(n.status||'active')}`:'';
+    return `<g class="graph-node ${isHyp?'node-hypothesis':'node-evidence'}${statusCls}" data-node="${esc(n.id)}" transform="translate(${p.x},${p.y})">
+    ${isHyp?`<rect x="-62" y="-22" width="124" height="44" rx="10"></rect>`:`<circle r="26"></circle>`}
+    <text class="node-label" y="4">${esc(label)}</text></g>`;
+  }).join('');
+  const defs=['edge-supports','edge-contradicts','edge-flag'].map(c=>`<marker id="arrow-${c}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"></path></marker>`).join('');
+  return `<svg viewBox="0 0 ${width} ${height}" class="graph-svg" style="min-width:${width}px">
+  <defs>${defs}</defs>
+  <g class="graph-row-label"><text x="${pad}" y="18">Evidence</text><text x="${pad}" y="${botY+42}">Hypotheses</text></g>
+  ${edgesSvg}${nodeSvg}</svg>
+  <div id="graphDetail" class="graph-detail" hidden></div>`;
+}
+function graphTabHtml(){
+  return `<div class="card graph-card">
+    <div class="graph-toolbar"><h3>Knowledge graph</h3><button data-a="graph-refresh">&#8635; Refresh</button></div>
+    <p class="mu">Built from your own discovered evidence and the hypotheses, links and contradiction flags you've created - nothing hidden is revealed.</p>
+    <div class="graph-legend">
+      <span class="legend-item"><span class="legend-dot legend-evidence"></span>Evidence</span>
+      <span class="legend-item"><span class="legend-dot legend-hypothesis"></span>Hypothesis</span>
+      <span class="legend-item"><span class="legend-line legend-supports"></span>Supports</span>
+      <span class="legend-item"><span class="legend-line legend-contradicts"></span>Contradicts</span>
+      <span class="legend-item"><span class="legend-line legend-flag"></span>Flagged contradiction</span>
+    </div>
+    <div id="graphWrap" class="graph-wrap">${graphBodyHtml()}</div>
+  </div>`;
+}
+function wsContentHtml(){
+  if(wsTab==='chat')return chatTabHtml();
+  if(wsTab==='hyp')return hypTabHtml();
+  if(wsTab==='notes')return notesTabHtml();
+  if(wsTab==='timeline')return timelineTabHtml();
+  if(wsTab==='graph')return graphTabHtml();
+  return evidenceTabHtml();
+}
+function wsView(){
+  return `${wsHeaderHtml()}${sharePanelHtml()}${wsTabsHtml()}<div id="wsContent">${wsContentHtml()}</div>`;
+}
+function skillBand(score){if(score==null)return 'na';if(score>=75)return 'strong';if(score>=50)return 'mid';return 'weak'}
+function reportView(){
+  const r=rep,p=r.performance,b=r.behavior;
+  const list=items=>items.length?`<ul class="insight-list">${items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p class="mu">None identified.</p>';
+  const finalPct=Math.max(0,Math.min(100,Math.round(p.final||0)));
+  const statusLabel=r.status.replace(/_/g,' ');
+  const statusTagCls=r.status==='solved'?'tag-done':r.status==='partially_solved'?'diff-medium':r.status==='unsolved'?'diff-hard':'';
+  const skillRows=Object.entries(r.skills).map(([k,s])=>{
+    const band=skillBand(s.score);
+    return `<div class="skill-row">
+    <div class="skill-row-top"><span class="skill-name">${esc(k.replace(/_/g,' '))}</span><span class="skill-score band-${band}">${s.score==null?'n/a':s.score+'/100'}</span></div>
+    <div class="skill-bar"><div class="skill-bar-fill band-${band}" style="width:${s.score==null?0:s.score}%"></div></div>
+    <div class="skill-explanation">${esc(s.explanation)}</div>
+    ${s.data_coverage<1?`<div class="coverage-note">Based on ${Math.round(s.data_coverage*100)}% of this skill's indicators having data in this case.</div>`:''}
+    </div>`;
+  }).join('');
+  const behaviorLabel=k=>k.endsWith('_s')?k.slice(0,-2).replace(/_/g,' ')+' (seconds)':k.replace(/_/g,' ');
+  const behaviorTiles=Object.entries(b).map(([k,v])=>`<div class="behavior-tile"><div class="behavior-tile-val">${esc(v??'n/a')}</div><div class="behavior-tile-label">${esc(behaviorLabel(k))}</div></div>`).join('');
+  const decisions=r.key_decision_points.length?`<div class="timeline-list decision-list">${r.key_decision_points.map(d=>`<div class="timeline-row"><span class="timeline-icon">&#8226;</span><div class="timeline-body">${esc(d.moment)}</div></div>`).join('')}</div>`:'<p class="mu">No key decision points recorded.</p>';
+  return `<div class="card report-header">
+    <div class="ws-header-top"><button data-a="home">&larr; Cases</button><div class="report-actions"><button data-a="print-report">Print / Save as PDF</button></div></div>
+    <div class="report-top">
+      <div class="score-ring" style="background:conic-gradient(var(--ac) ${finalPct}%, var(--bd) 0)"><div class="score-ring-inner"><div class="score-ring-num">${pct(p.final)}</div><div class="score-ring-label">/ 100</div></div></div>
+      <div class="report-meta">
+        <div class="report-meta-title">${esc(r.title)}</div>
+        <div class="report-status-row"><span class="tag ${statusTagCls}">${esc(statusLabel)}</span>
+        <span class="mu">Solution reliability: ${r.solution_reliability??'n/a'}</span></div>
+        ${r.flags.map(f=>`<div class="flag-banner">&#9888; ${esc(f)}</div>`).join('')}
+      </div>
+    </div>
+    <div class="perf-breakdown">
+      <div class="perf-item"><div class="perf-item-top"><span class="mu">Outcome</span><b>${pct(p.outcome)}</b></div><div class="perf-bar"><div class="perf-bar-fill" style="width:${Math.max(0,Math.min(100,p.outcome||0))}%"></div></div></div>
+      <div class="perf-item"><div class="perf-item-top"><span class="mu">Reasoning</span><b>${pct(p.reasoning)}</b></div><div class="perf-bar"><div class="perf-bar-fill" style="width:${Math.max(0,Math.min(100,p.reasoning||0))}%"></div></div></div>
+      <div class="perf-item"><div class="perf-item-top"><span class="mu">Process</span><b>${pct(p.process)}</b></div><div class="perf-bar"><div class="perf-bar-fill" style="width:${Math.max(0,Math.min(100,p.process||0))}%"></div></div></div>
+    </div>
+  </div>
+  <div class="grid report-grid">
+    <div class="card"><h2>Cognitive profile</h2>${skillRows}</div>
+    <div class="card"><h2>Investigation behavior</h2><div class="behavior-grid">${behaviorTiles}</div></div>
+    <div class="card insight-card insight-strength"><h2>Strengths</h2>${list(r.strengths)}</div>
+    <div class="card insight-card insight-improve"><h2>Areas for improvement</h2>${list(r.improvements)}</div>
+    <div class="card insight-card insight-missed"><h2>Missed opportunities</h2>${list(r.missed_opportunities)}</div>
+    <div class="card"><h2>Key decision points</h2>${decisions}</div>
+    <div class="card insight-card insight-recommend"><h2>Recommended development</h2>${list(r.recommended_development)}</div>
+  </div>
+  <div class="card report-notice">${esc(r.notice)}</div>`;
+}
+
+async function loadCases(){sid=ws=rep=null;page='cases';casesLoaded=false;draw();
+  const [cs,ss,pr]=await Promise.all([api('GET','/cases'),api('GET','/sessions'),api('GET','/profile').catch(()=>null)]);
+  cases=cs;mySessions=ss;profileData=pr;casesLoaded=true;draw();}
+async function loadPrivacy(){sid=ws=rep=null;page='privacy';privacyNotice=null;privacyLoadError=null;privacyExportState='idle';privacyExportError='';privacyDeleteBusy=false;draw();
+  try{privacyNotice=await api('GET','/privacy/notice')}catch(ex){privacyLoadError=ex.message||'Could not load privacy information.'}
+  draw();}
+async function loadShared(){sharedLoading=true;sharedError='';sharedData=null;draw();
+  try{const r=await fetch('/shared/'+encodeURIComponent(sharedToken),{headers:{Accept:'application/json'}});let d=null;try{d=await r.json()}catch(e){}
+    if(!r.ok)throw new Error(fmtErr(d)||'This link is unavailable.');sharedData=d}
+  catch(ex){sharedError=ex.message||'This link is unavailable.'}
+  sharedLoading=false;draw();}
+async function loadProfile(){sid=ws=rep=null;page='profile';profileData=null;profileLoadError=null;profileLatestRec=null;profileLatestRecError=null;draw();
+  try{profileData=await api('GET','/profile')}catch(ex){profileLoadError=ex.message||'Could not load your profile.';draw();return}
+  draw();
+  if(profileData.history.length)loadProfileRecommendation();}
+async function loadProfileRecommendation(){
+  const latest=profileData.history[profileData.history.length-1];
+  profileLatestRecLoading=true;draw();
+  try{const rep2=await api('GET',`/sessions/${latest.session_id}/report`);profileLatestRec={title:latest.title,items:rep2.recommended_development||[]}}
+  catch(ex){profileLatestRecError='Could not load development recommendations right now.'}
+  profileLatestRecLoading=false;draw();}
+async function loadAdmin(){sid=ws=rep=null;page='admin';adminTab='analytics';analytics=adminCases=null;adminLoadError=null;draw();
+  try{[analytics,adminCases]=await Promise.all([api('GET','/admin/analytics'),api('GET','/admin/cases')])}
+  catch(ex){adminLoadError=ex.message||'Could not load admin data.'}
+  draw();}
+async function refreshAdminData(){
+  try{[analytics,adminCases]=await Promise.all([api('GET','/admin/analytics'),api('GET','/admin/cases')]);adminLoadError=null}
+  catch(ex){adminLoadError=ex.message||'Could not load admin data.'}
+  draw();}
+async function refreshWs(){ws=await api('GET','/sessions/'+sid);rep=ws.closed?await api('GET',`/sessions/${sid}/report`):null;wsGraph=null;draw();if(wsTab==='graph')loadGraph()}
+async function loadWs(id){sid=id;wsTab='evidence';wsGraph=null;wsGraphError=null;wsGraphLoading=false;wsActivity=[];chatThinking=false;chatError=null;evFilter={q:'',onlyUnopened:false};
+  await refreshWs();if(ws&&!ws.closed)logActivity('open','Opened investigation')}
+async function loadGraph(){if(wsGraphLoading)return;wsGraphLoading=true;wsGraphError=null;draw();
+  try{wsGraph=await api('GET',S()+'/graph')}catch(ex){wsGraphError=ex.message||'Failed to load the knowledge graph.'}
+  wsGraphLoading=false;draw()}
+async function afterAuth(email,password){const d=await api('POST','/auth/login',{email,password});token=d.access_token;user=d.user;
+  try{sessionStorage.setItem('t',token)}catch(e){}await loadCases()}
+const act=async(fn)=>{try{await fn()}catch(e){toast(e.message)}};
+const S=()=>'/sessions/'+sid;
+
+document.addEventListener('submit',e=>{e.preventDefault();const a=e.target.dataset.a,f=F(e),id=e.target.dataset.id;
+  if(a==='admin-save'){const btn=e.submitter,mode=btn?btn.dataset.mode:'create';return act(async()=>{
+    let parsed;try{parsed=JSON.parse(f.json)}catch(x){throw new Error('Invalid JSON: '+x.message)}
+    caseDraft=f.json;
+    if(mode==='create')await api('POST','/admin/cases',parsed);else await api('PUT','/admin/cases/'+parsed.case_id,parsed);
+    toast(mode==='create'?'Case created.':'Case updated.');
+    return refreshAdminData()})}
+  if(a==='login'||a==='register'){
+    const btn=$('#authSubmit'),err=$('#authErr');
+    if(err){err.hidden=true;err.textContent=''}
+    if(btn){btn.dataset.label=btn.dataset.label||btn.textContent;btn.disabled=true;
+      btn.innerHTML='<span class="auth-spin"></span>'+(a==='login'?'Signing in…':'Creating account…')}
+    (async()=>{try{
+      if(a==='login')await afterAuth(f.email,f.password);
+      else{await api('POST','/auth/register',{email:f.email,password:f.password,consent_version:consent.version});await afterAuth(f.email,f.password)}
+    }catch(ex){
+      if(err){err.textContent=ex.message||'Something went wrong. Please try again.';err.hidden=false}else toast(ex.message);
+      if(btn){btn.disabled=false;btn.textContent=btn.dataset.label}
+    }})();
+    return;
+  }
+  if(a==='ask'){
+    const text=f.text;if(!text)return;
+    chatError=null;chatThinking=true;draw();
+    (async()=>{try{
+      const r=await api('POST',S()+'/ask',{text});
+      const evidence=[...(r.new_evidence||[]),...(r.adaptive_evidence||[])];
+      chat.push({sid,q:text,a:r.response,evidence});logActivity('ask','Asked: "'+text+'"');
+      chatThinking=false;await refreshWs();
+    }catch(ex){chatThinking=false;chatError=ex.message||'Something went wrong answering that. Please try again.';draw()}})();
+    return;
+  }
+  act(async()=>{
+  if(a==='hyp'){await api('POST',S()+'/hypotheses',{statement:f.statement,confidence:f.c/100});logActivity('hyp','New hypothesis: "'+f.statement+'"');return refreshWs()}
+  if(a==='link'){await api('POST',S()+'/links',{hypothesis_id:id,evidence_id:f.e,relation:f.r});logActivity('link',`Linked ${f.e} (${f.r}) to ${id}`);return refreshWs()}
+  if(a==='flag'){await api('POST',S()+'/contradictions',{evidence_a:f.a,evidence_b:f.b});logActivity('flag',`Flagged contradiction: ${f.a} vs ${f.b}`);return refreshWs()}
+  if(a==='note'){await api('POST',S()+'/notes',{text:f.text});logActivity('note','Added a note');return refreshWs()}
+  if(a==='conclude'){if(!await askConfirmation({title:'Submit final conclusion?',message:'Submitting locks this investigation. You will not be able to change your conclusion afterward.',acceptLabel:'Submit conclusion'}))return;
+    const cited=[...e.target.querySelectorAll('input[name=cite]:checked')].map(x=>x.value);
+    await api('POST',S()+'/conclusion',{text:f.text,confidence:f.c/100,cited_evidence:cited});logActivity('conclude','Submitted final conclusion');return loadWs(sid)}
+})});
+document.addEventListener('click',e=>{const t=e.target.closest('button[data-a]');if(!t||(t.form&&!t.matches('[data-a^="confirm-"]')))return;const a=t.dataset.a,id=t.dataset.id;act(async()=>{
+  if(a==='confirm-accept'){if(!t.disabled)finishConfirmation(true);return}
+  if(a==='confirm-cancel'){finishConfirmation(false);return}
+  if(a==='out'){try{await api('POST','/auth/logout')}catch(x){}return signOut()}
+  if(a==='mode'){mode=mode==='login'?'register':'login';if(mode==='register'&&!consent)consent=await api('GET','/consent');return draw()}
+  if(a==='home')return loadCases();
+  if(a==='nav'){sid=ws=rep=null;const p=t.dataset.p;if(p==='profile')return loadProfile();if(p==='admin')return loadAdmin();if(p==='privacy')return loadPrivacy();return loadCases()}
+  if(a==='privacy-retry')return loadPrivacy();
+  if(a==='admin-load'){const c=await api('GET','/admin/cases/'+id);caseDraft=JSON.stringify(c,null,2);adminTab='author';return draw()}
+  if(a==='admin-del'){if(!await askConfirmation({title:'Delete case?',message:`Delete ${id}? This action cannot be undone.`,acceptLabel:'Delete case'}))return;await api('DELETE','/admin/cases/'+id);toast('Case deleted.','success');return refreshAdminData()}
+  if(a==='admin-tab'){adminTab=t.dataset.t;return draw()}
+  if(a==='admin-clear'){caseDraft='';return draw()}
+  if(a==='start'){const d=await api('POST','/sessions',{case_id:id});return loadWs(d.session_id)}
+  if(a==='resume')return loadWs(id);
+  if(a==='view'){await api('POST',S()+'/evidence/view',{evidence_id:id});logActivity('view','Opened evidence '+id);return refreshWs()}
+  if(a==='rel'){const v=t.dataset.v==='1';await api('POST',S()+'/evidence/relevance',{evidence_id:id,relevant:v});logActivity('rel',`Marked ${id} as ${v?'relevant':'not relevant'}`);return refreshWs()}
+  if(a==='wstab'){wsTab=t.dataset.t;draw();if(wsTab==='graph'&&!wsGraph)return loadGraph();return}
+  if(a==='graph-refresh')return loadGraph();
+  if(a==='suggest'){const inp=$('#chatInput');if(inp){inp.value=t.dataset.q;inp.focus()}return}
+  if(a==='chat-ev'){wsTab='evidence';evFilter={...evFilter,q:''};draw();return}
+  if(a==='print-report'){window.print();return}
+  if(a==='share'){const r=await api('POST',S()+'/share');shareUrl=location.origin+'/?shared='+encodeURIComponent(r.share_token);shareSessionId=sid;draw();toast('Read-only link created.','success');return}
+  if(a==='share-copy'){const input=$('#shareUrl');try{await navigator.clipboard.writeText(shareUrl);toast('Read-only link copied.','success')}
+    catch(ex){input.focus();input.select();toast('Link selected. Copy it to share.','info')}return}
+  if(a==='share-revoke'){if(!await askConfirmation({title:'Revoke shared links?',message:'Anyone using an existing link to this investigation will lose access.',acceptLabel:'Revoke links'}))return;
+    await api('DELETE',S()+'/share');shareUrl='';shareSessionId=null;draw();toast('All share links for this investigation were revoked.','success');return}
+  if(a==='privacy-export'){
+    privacyExportState='loading';privacyExportError='';draw();
+    try{const data=await api('GET','/privacy/export');const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+      const objectUrl=URL.createObjectURL(blob),a2=document.createElement('a');a2.href=objectUrl;a2.download='cra-data-export.json';document.body.appendChild(a2);a2.click();a2.remove();setTimeout(()=>URL.revokeObjectURL(objectUrl),1000);
+      privacyExportState='success';toast('Your data export is ready.','success')}
+    catch(ex){privacyExportState='error';privacyExportError=ex.message||'The export could not be prepared.';toast(privacyExportError,'error')}
+    draw();return}
+  if(a==='privacy-delete'){
+    if(!await askConfirmation({title:'Permanently delete your account?',message:'This erases your account, all investigation history and every share link created by this account. There is no recovery. Type DELETE to continue.',acceptLabel:'Delete account',requireDelete:true}))return;
+    privacyDeleteBusy=true;draw();try{await api('DELETE','/privacy/account');toast('Your account and data have been deleted.','success');return signOut()}
+    catch(ex){privacyDeleteBusy=false;draw();throw ex}}
+})});
+document.addEventListener('input',e=>{
+  if(e.target.id==='caseSearch'){caseFilter.q=e.target.value;renderGridOnly()}
+  if(e.target.id==='evSearch'){evFilter.q=e.target.value;renderEvGridOnly()}
+  if(e.target.id==='adminAnalyticsSearch'){adminAnalyticsFilter.q=e.target.value;renderAnalyticsOnly()}
+  if(e.target.id==='adminCaseSearch'){adminCaseFilter.q=e.target.value;renderAdminCaseListOnly()}
+});
+document.addEventListener('change',e=>{const t=e.target,a=t.dataset&&t.dataset.a,id=t.dataset&&t.dataset.id;
+  if(t.id==='caseDifficulty'){caseFilter.difficulty=t.value;return renderGridOnly()}
+  if(t.id==='caseSort'){caseFilter.sort=t.value;return renderGridOnly()}
+  if(t.id==='evOnlyUnopened'){evFilter.onlyUnopened=t.checked;return renderEvGridOnly()}
+  if(t.id==='adminAnalyticsSort'){adminAnalyticsFilter.sort=t.value;return renderAnalyticsOnly()}
+  if(a==='conf'||a==='status')act(async()=>{await api('PATCH',`${S()}/hypotheses/${id}`,a==='conf'?{confidence:t.value/100}:{status:t.value});logActivity(a,a==='conf'?`Adjusted confidence on ${id}`:`Set ${id} status to ${t.value}`);return refreshWs()})});
+document.addEventListener('click',e=>{
+  const th=e.target.closest('th[data-a="admin-sort"]');
+  if(th){adminAnalyticsFilter.sort=th.dataset.k;renderAnalyticsOnly();return}
+});
+document.addEventListener('click',e=>{
+  const g=e.target.closest('.graph-node');if(!g)return;
+  const nid=g.dataset.node;const n=(wsGraph&&wsGraph.nodes||[]).find(x=>x.id===nid);
+  const panel=$('#graphDetail');if(!panel||!n)return;
+  document.querySelectorAll('.graph-node.selected').forEach(x=>x.classList.remove('selected'));
+  g.classList.add('selected');panel.hidden=false;
+  panel.innerHTML=n.kind==='hypothesis'
+    ?`<b>${esc(n.id)}</b> ${esc(n.label)}<div class="mu">Status: ${esc(n.status)} &middot; Confidence ${Math.round((n.confidence||0)*100)}%</div>`
+    :`<b>${esc(n.id)}</b> ${esc(n.label)}<div class="mu">Type: ${esc(n.type)} &middot; ${n.opened?'Opened':'Not yet opened'}</div>`;
+});
+(async()=>{if(sharedToken)return loadShared();if(token){try{user=await api('GET','/me');return await loadCases()}catch(e){token=null}}draw()})();
+</script></body></html>
