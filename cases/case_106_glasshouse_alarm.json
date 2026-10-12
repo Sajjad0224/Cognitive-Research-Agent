@@ -1,0 +1,34 @@
+{
+  "case_id": "CASE-106",
+  "title": "The Glasshouse Alarm",
+  "domain": "suspicious incident",
+  "difficulty": "medium",
+  "overview": "An overnight alarm and a burst irrigation pipe damage a rare-plant greenhouse. The first explanation is equipment failure, but the timing appears unusual.",
+  "objective": "Determine whether the damage was accidental or deliberately arranged, and identify the strongest corroborated explanation.",
+  "time_limit_minutes": null,
+  "hypotheses": [
+    {"id": "H1", "level": "correct", "statement": "A contractor deliberately opened the drain valve to conceal an unauthorized attempt to remove plants.", "match_keywords": ["contractor", "valve", "deliberate", "remove", "plants", "conceal"]},
+    {"id": "H2", "level": "incorrect", "statement": "A pressure fault caused a pipe failure and accidental flooding.", "match_keywords": ["pressure", "fault", "accident", "pipe", "failure"]}
+  ],
+  "evidence": [
+    {"id": "H-01", "title": "Facilities incident report", "type": "report", "reliability": 0.9, "relevance": 0.5, "directness": 0.4, "initial": true, "content": "Water was found across the propagation room at 2:16 AM. Several rare seedlings were missing from a locked cabinet."},
+    {"id": "H-02", "title": "Greenhouse access roster", "type": "document", "reliability": 1.0, "relevance": 0.35, "directness": 0.2, "initial": true, "content": "Horticulturist Jules Moreno, contractor Cal Rusk, and night custodian Mei Lin held authorized access during the week."},
+    {"id": "H-03", "title": "Irrigation control log", "type": "log", "reliability": 0.98, "relevance": 0.9, "directness": 0.85, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["irrigation", "valve", "control", "pressure"]}, "content": "The drain valve was manually opened at 1:48 AM using the maintenance override. Pressure sensors remained within normal range before the valve opened."},
+    {"id": "H-04", "title": "Contractor work order", "type": "document", "reliability": 0.9, "relevance": 0.85, "directness": 0.75, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["contractor", "work order", "maintenance", "override"]}, "content": "Cal Rusk's temporary override code was used outside the scheduled work window. His work order was closed the previous afternoon."},
+    {"id": "H-05", "title": "Custodian's observation", "type": "statement", "reliability": 0.7, "relevance": 0.7, "directness": 0.65, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["custodian", "witness", "observation", "cart"]}, "content": "Mei Lin saw a covered plant cart leave through the loading bay shortly before the alarm, although no plant transfer was scheduled."}
+  ],
+  "contradictions": [{"id": "C-1", "evidence": ["H-03", "H-04"]}],
+  "required_evidence": ["H-03", "H-04", "H-05"],
+  "suspects": [
+    {"id": "S-01", "name": "Cal Rusk", "role": "Contractor whose override code opened the valve", "evidence_id": "H-04"},
+    {"id": "S-02", "name": "Jules Moreno", "role": "Horticulturist with plant-cabinet access", "evidence_id": "H-02"}
+  ],
+  "witness_statements": [{"id": "W-01", "person": "Mei Lin", "evidence_id": "H-05", "statement": "She saw a covered plant cart leave the loading bay shortly before the alarm."}],
+  "timeline": [
+    {"time": "Previous afternoon", "event": "Cal Rusk's work order was closed.", "evidence_id": "H-04"},
+    {"time": "1:48 AM", "event": "The irrigation drain valve was manually opened while pressure remained normal.", "evidence_id": "H-03"},
+    {"time": "Shortly before 2:16 AM", "event": "A covered plant cart left the loading bay.", "evidence_id": "H-05"},
+    {"time": "2:16 AM", "event": "Water damage and missing seedlings were reported.", "evidence_id": "H-01"}
+  ],
+  "scoring_weights": {}
+}

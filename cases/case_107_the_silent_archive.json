@@ -1,0 +1,34 @@
+{
+  "case_id": "CASE-107",
+  "title": "The Silent Archive",
+  "domain": "art theft",
+  "difficulty": "hard",
+  "overview": "A rare first-edition manuscript vanishes from a university archive with no sign of forced entry. A scheduled catalog migration provides a convenient explanation.",
+  "objective": "Establish whether the manuscript was misplaced during routine cataloging or removed by someone who understood the archive's procedures.",
+  "time_limit_minutes": null,
+  "hypotheses": [
+    {"id": "H1", "level": "correct", "statement": "Archivist Simone Vale used a planned catalog move to remove the manuscript and falsify its location.", "match_keywords": ["Simone", "Vale", "archivist", "planned", "catalog", "falsify", "removed"]},
+    {"id": "H2", "level": "incorrect", "statement": "The manuscript was misplaced during the scheduled catalog migration.", "match_keywords": ["misplaced", "migration", "catalog error", "accident"]}
+  ],
+  "evidence": [
+    {"id": "A-01", "title": "Collection discrepancy report", "type": "report", "reliability": 0.9, "relevance": 0.5, "directness": 0.4, "initial": true, "content": "A first-edition manuscript is missing from a sealed archive room. The catalog lists it as temporarily relocated during migration."},
+    {"id": "A-02", "title": "Archive staff and access roles", "type": "document", "reliability": 1.0, "relevance": 0.4, "directness": 0.2, "initial": true, "content": "Simone Vale supervised cataloging; assistant Noor Patel and conservator Emil Hart had escorted access."},
+    {"id": "A-03", "title": "Catalog change history", "type": "audit log", "reliability": 0.98, "relevance": 0.9, "directness": 0.85, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["catalog", "change", "migration", "record"]}, "content": "The relocation entry was created three days before the migration began using Simone Vale's administrator account. No move ticket or destination shelf was recorded."},
+    {"id": "A-04", "title": "Reading room access log", "type": "log", "reliability": 0.95, "relevance": 0.9, "directness": 0.8, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["access", "door", "reading room", "badge"]}, "content": "Simone Vale entered the archive alone after closing on the evening the catalog entry was created. The migration team had not yet received access."},
+    {"id": "A-05", "title": "Conservation bench inventory", "type": "inventory", "reliability": 0.9, "relevance": 0.85, "directness": 0.75, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["inventory", "bench", "conservation", "shelf"]}, "content": "A custom acid-free transport sleeve issued to Simone was missing from the conservation bench, but no relocation was logged."}
+  ],
+  "contradictions": [{"id": "C-1", "evidence": ["A-03", "A-04"]}],
+  "required_evidence": ["A-03", "A-04", "A-05"],
+  "suspects": [
+    {"id": "S-01", "name": "Simone Vale", "role": "Senior archivist with catalog administrator access", "evidence_id": "A-02"},
+    {"id": "S-02", "name": "Noor Patel", "role": "Archive assistant", "evidence_id": "A-02"},
+    {"id": "S-03", "name": "Emil Hart", "role": "Conservator with escorted access", "evidence_id": "A-02"}
+  ],
+  "witness_statements": [{"id": "W-01", "person": "Migration coordinator", "evidence_id": "A-03", "statement": "The migration had not started when the manuscript relocation entry was added."}],
+  "timeline": [
+    {"time": "Three days before migration", "event": "A relocation entry was created without a destination or move ticket.", "evidence_id": "A-03"},
+    {"time": "After closing", "event": "Simone Vale entered the archive alone.", "evidence_id": "A-04"},
+    {"time": "Migration week", "event": "A transport sleeve issued to Simone was found missing.", "evidence_id": "A-05"}
+  ],
+  "scoring_weights": {}
+}

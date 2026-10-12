@@ -1,0 +1,34 @@
+{
+  "case_id": "CASE-101",
+  "title": "The Locked Gallery",
+  "domain": "murder mystery",
+  "difficulty": "medium",
+  "overview": "A respected curator is found dead after a private evening event at the Bellweather Museum. The gallery was locked, and the first account suggests an accident.",
+  "objective": "Determine whether the death was accidental or deliberate, and identify the person whose access and account best fit the evidence.",
+  "time_limit_minutes": null,
+  "hypotheses": [
+    {"id": "H1", "level": "correct", "statement": "Deputy curator Elias Venn used a service key to enter the gallery and staged the death as an accident.", "match_keywords": ["Elias", "Venn", "curator", "service key", "staged", "deliberate", "murder"]},
+    {"id": "H2", "level": "incorrect", "statement": "The curator suffered an accidental fall after the public event.", "match_keywords": ["accident", "fall", "misstep", "natural"]}
+  ],
+  "evidence": [
+    {"id": "G-01", "title": "Initial incident report", "type": "report", "reliability": 0.9, "relevance": 0.5, "directness": 0.4, "initial": true, "content": "The curator was found in the east gallery shortly after closing. No visitors remained in the building. The scene was secured for review."},
+    {"id": "G-02", "title": "Evening staff roster", "type": "document", "reliability": 1.0, "relevance": 0.4, "directness": 0.2, "initial": true, "content": "Curator Mara Bell, deputy curator Elias Venn, guard Imani Cole, and conservator Peter Shaw worked the evening event."},
+    {"id": "G-03", "title": "Service corridor access log", "type": "log", "reliability": 0.95, "relevance": 0.9, "directness": 0.8, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["key", "access", "corridor", "entry", "badge"]}, "content": "A staff service key opened the east gallery door at 9:18 PM, after the public event ended. The key was assigned to Elias Venn."},
+    {"id": "G-04", "title": "Conservator's statement", "type": "statement", "reliability": 0.65, "relevance": 0.7, "directness": 0.6, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["witness", "conservator", "Peter", "heard", "statement"]}, "content": "Peter Shaw heard Elias ask Mara to meet privately in the east gallery. He later saw Elias leave alone and hurry toward the staff exit."},
+    {"id": "G-05", "title": "Scene review", "type": "forensic report", "reliability": 0.92, "relevance": 0.9, "directness": 0.75, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["scene", "medical", "injury", "review"]}, "content": "The room layout and injury pattern are inconsistent with a simple fall. A small display stand had been moved and wiped clean."}
+  ],
+  "contradictions": [{"id": "C-1", "evidence": ["G-03", "G-04"]}],
+  "required_evidence": ["G-03", "G-05"],
+  "suspects": [
+    {"id": "S-01", "name": "Elias Venn", "role": "Deputy curator with a service key", "evidence_id": "G-02"},
+    {"id": "S-02", "name": "Imani Cole", "role": "Evening security guard", "evidence_id": "G-02"},
+    {"id": "S-03", "name": "Peter Shaw", "role": "Conservator and event staff", "evidence_id": "G-02"}
+  ],
+  "witness_statements": [{"id": "W-01", "person": "Peter Shaw", "evidence_id": "G-04", "statement": "He heard Elias request a private meeting and saw him leave the gallery alone."}],
+  "timeline": [
+    {"time": "8:45 PM", "event": "The public event ended and visitors left.", "evidence_id": "G-01"},
+    {"time": "9:18 PM", "event": "The east gallery was opened with Elias Venn's assigned service key.", "evidence_id": "G-03"},
+    {"time": "After 9:18 PM", "event": "Peter Shaw saw Elias leave the gallery alone.", "evidence_id": "G-04"}
+  ],
+  "scoring_weights": {}
+}

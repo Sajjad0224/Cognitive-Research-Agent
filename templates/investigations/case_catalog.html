@@ -1,0 +1,54 @@
+{% extends "investigations/base.html" %}
+{% block title %}Case Archive — Cognitive Research Platform{% endblock %}
+{% block content %}
+<section class="catalog-intro mb-4 mb-lg-5">
+  <p class="eyebrow mb-2">COGNITIVE RESEARCH PLATFORM</p>
+  <h1 class="display-5 fw-semibold mb-3">Think critically. Follow the evidence.</h1>
+  <p class="lead text-secondary mb-0">Explore a case, examine the evidence, test your theory, and receive a report on your investigation process.</p>
+</section>
+<section class="stats-panel mb-5" aria-label="Case statistics">
+  <div class="stat-item"><span class="stat-value">{{ case_total }}</span><span class="stat-label">Total cases</span></div>
+  <div class="stat-item"><span class="stat-value">{{ solved_total }}</span><span class="stat-label">Solved cases</span></div>
+  <div class="stat-item"><span class="stat-value">{{ active_total }}</span><span class="stat-label">Active cases</span></div>
+</section>
+<div class="d-flex justify-content-between align-items-end gap-3 flex-wrap mb-4">
+  <div><p class="eyebrow mb-1">THE CASE ARCHIVE</p><h2 class="h4 mb-0">Available investigations</h2></div>
+  <span class="small text-secondary">{{ cases|length }} case{{ cases|length|pluralize }}</span>
+</div>
+<div class="row g-3 g-xl-4 case-grid">
+  {% for case in cases %}
+  <div class="col-sm-6 col-xl-4">
+    <article class="case-tile h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge difficulty-badge">{{ case.difficulty|title }} level</span>
+        <span class="small text-secondary text-uppercase letterspace">{{ case.domain }}</span>
+      </div>
+      <h3 class="h5 mb-2">{{ case.title }}</h3>
+      <p class="text-secondary flex-grow-1">{{ case.overview }}</p>
+      <div class="case-objective small mb-3"><strong>Investigation objective</strong><p class="mb-0 mt-1 text-secondary">{{ case.objective }}</p></div>
+      <p class="case-meta small text-secondary mb-3">
+        <span>{{ case.dataset.evidence|length }} evidence record{{ case.dataset.evidence|length|pluralize }}</span>
+        <span>{{ case.dataset.suspects|length }} person{{ case.dataset.suspects|length|pluralize }} of interest</span>
+        <span>{{ case.dataset.witness_statements|length }} witness statement{{ case.dataset.witness_statements|length|pluralize }}</span>
+      </p>
+      {% if case.recent_investigation %}
+        {% with item=case.recent_investigation %}
+        <a class="btn btn-outline-dark w-100 mt-auto" href="{% if item.completed_at %}{% url 'investigation_report' item.session_id %}{% else %}{% url 'investigation_workspace' item.session_id %}{% endif %}">
+          {% if item.completed_at %}Review your report{% else %}Resume investigation{% endif %}
+        </a>
+        {% endwith %}
+      {% else %}
+        <form class="mt-auto" method="post" action="{% url 'start_investigation' case.case_id %}">{% csrf_token %}
+          <button class="btn btn-primary w-100" type="submit">Open case file <span aria-hidden="true">→</span></button>
+        </form>
+      {% endif %}
+    </article>
+  </div>
+  {% empty %}
+  <div class="col-12"><div class="empty-archive">
+    <h2 class="h5">The archive is being prepared</h2>
+    <p class="text-secondary mb-0">Run <code>python manage.py load_cases</code> to load the case files.</p>
+  </div></div>
+  {% endfor %}
+</div>
+{% endblock %}

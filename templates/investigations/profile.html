@@ -1,0 +1,38 @@
+{% extends "investigations/base.html" %}
+{% block title %}Profile — Cognitive Research Platform{% endblock %}
+{% block content %}
+<header class="profile-header mb-4 mb-lg-5">
+  <p class="eyebrow mb-2">INVESTIGATOR PROFILE</p>
+  <h1 class="display-6 fw-semibold mb-2">{{ request.user.get_full_name|default:request.user.username }}</h1>
+  <p class="text-secondary mb-0">Your investigation history and evidence analysis reports.</p>
+</header>
+<section class="stats-panel profile-stats mb-5" aria-label="Your investigation statistics">
+  <div class="stat-item"><span class="stat-value">{{ solved_total }}</span><span class="stat-label">Cases solved</span></div>
+  <div class="stat-item"><span class="stat-value">{{ attempted_total }}</span><span class="stat-label">Cases attempted</span></div>
+  <div class="stat-item"><span class="stat-value">{{ reports_total }}</span><span class="stat-label">Reports available</span></div>
+</section>
+<section>
+  <div class="mb-4"><p class="eyebrow mb-1">PERFORMANCE</p><h2 class="h4 mb-0">Investigation reports</h2></div>
+  <div class="row g-3 g-xl-4">
+    {% for item in reports %}
+    <div class="col-md-6 col-xl-4">
+      <article class="report-card h-100">
+        <p class="small text-secondary mb-2">{{ item.investigation.completed_at|date:"M j, Y" }} · {{ item.investigation.case.domain }}</p>
+        <h3 class="h5">{{ item.investigation.case.title }}</h3>
+        <div class="d-flex align-items-baseline gap-2 mb-3">
+          <strong class="report-card-score">{{ item.report.performance.final|default:"—" }}</strong>
+          <span class="small text-secondary">overall score / 100</span>
+        </div>
+        <a class="btn btn-outline-dark w-100 mt-auto" href="{% url 'investigation_report' item.investigation.session_id %}">View performance report</a>
+      </article>
+    </div>
+    {% empty %}
+    <div class="col-12"><div class="empty-archive">
+      <h3 class="h5">Your report history starts with your first conclusion.</h3>
+      <p class="text-secondary">Browse the archive and open a case whenever you are ready to investigate.</p>
+      <a class="btn btn-primary" href="{% url 'case_catalog' %}">Explore available cases</a>
+    </div></div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

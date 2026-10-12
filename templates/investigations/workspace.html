@@ -1,0 +1,81 @@
+{% extends "investigations/base.html" %}
+{% load static %}
+{% block title %}{{ case.title }} — Investigation{% endblock %}
+{% block content %}
+<div class="workspace-heading mb-4">
+  <a class="small text-secondary text-decoration-none" href="{% url 'case_catalog' %}">← Case archive</a>
+  <div class="d-flex justify-content-between align-items-start gap-3 mt-3 flex-wrap">
+    <div><p class="eyebrow mb-1">{{ case.domain }} · {{ case.difficulty }} case</p>
+      <h1 class="h2 mb-2">{{ case.title }}</h1><p class="text-secondary mb-0">{{ case.objective }}</p></div>
+    <span class="case-status"><span class="status-dot"></span> Investigation in progress</span>
+  </div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-8">
+    <section class="chat-panel" aria-label="Investigation conversation">
+      <div class="chat-panel-head"><div><p class="eyebrow mb-1">CASE AGENT</p><h2 class="h5 mb-0">Ask the case file</h2></div><span class="small text-secondary">Answers cite unlocked records</span></div>
+      <div id="conversation" class="conversation" aria-live="polite">
+        {% for turn in chat_turns %}
+        <div class="message user-message"><span class="message-label">YOU</span><p class="mb-0">{{ turn.question }}</p></div>
+        <div class="message agent-message"><span class="message-label">CASE AGENT</span><p class="mb-0">{{ turn.response }}</p></div>
+        {% empty %}
+        <div class="message agent-message"><span class="message-label">CASE AGENT</span><p class="mb-0">I'm ready to help you investigate. Ask about a person, record, event, or timeline. I'll answer from the evidence available in this case file.</p></div>
+        {% endfor %}
+      </div>
+      <form id="question-form" class="question-form">
+        {% csrf_token %}
+        <label class="visually-hidden" for="question">Ask a question about the case</label>
+        <textarea id="question" class="form-control" maxlength="5000" rows="2" placeholder="Ask a question about the case..." required></textarea>
+        <button id="ask-button" class="btn btn-primary" type="submit">Ask agent <span aria-hidden="true">↗</span></button>
+      </form>
+      <p class="small text-secondary mt-2 mb-0 px-3 pb-3">The agent only cites evidence you have discovered. Verify each lead before relying on it.</p>
+    </section>
+    <section class="conclusion-panel mt-4">
+      <div class="mb-3"><p class="eyebrow mb-1">YOUR FINDING</p><h2 class="h5 mb-1">Submit your conclusion</h2>
+        <p class="small text-secondary mb-0">State what happened, who was responsible, and why the evidence supports your decision.</p></div>
+      <form id="conclusion-form" data-url="{{ conclude_url }}">
+        {% csrf_token %}
+        <label for="conclusion" class="form-label">Conclusion and reasoning</label>
+        <textarea id="conclusion" class="form-control mb-3" rows="4" maxlength="5000" required placeholder="Explain your conclusion and the reasoning that led you there..."></textarea>
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+          <label for="confidence" class="form-label mb-0">Confidence</label>
+          <input id="confidence" type="range" class="form-range confidence-range" min="0" max="100" value="60">
+          <span id="confidence-value" class="confidence-value">60%</span>
+        </div>
+        <fieldset><legend class="form-label">Evidence supporting your conclusion</legend>
+          <div id="citation-list" class="citation-list">
+          {% for item in evidence %}<label class="form-check citation-item">
+            <input class="form-check-input citation-checkbox" type="checkbox" value="{{ item.id }}">
+            <span class="form-check-label"><strong>{{ item.id }}</strong> — {{ item.title }}</span>
+          </label>{% endfor %}
+          </div>
+        </fieldset>
+        <div id="conclusion-error" class="alert alert-danger mt-3 d-none" role="alert"></div>
+        <button class="btn btn-primary mt-3" type="submit">Complete investigation &amp; see report</button>
+      </form>
+    </section>
+  </div>
+  <aside class="col-lg-4">
+    <section class="evidence-panel sticky-lg-top">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div><p class="eyebrow mb-1">DISCOVERED RECORDS</p><h2 class="h5 mb-0">Evidence file</h2></div>
+        <span id="evidence-count" class="evidence-count">{{ evidence|length }}</span>
+      </div>
+      <p class="small text-secondary">Open a record to review it. Unopened records won't count as evidence analysis in your report.</p>
+      <div id="evidence-list">
+        {% for item in evidence %}
+        <details class="evidence-record" data-evidence-id="{{ item.id }}">
+          <summary><span class="evidence-id">{{ item.id }}</span><span>{{ item.title }}</span><span class="evidence-chevron">+</span></summary>
+          <div class="evidence-content text-secondary small">Open record to retrieve its contents.</div>
+        </details>
+        {% empty %}
+        <p class="small text-secondary">No records discovered yet. Ask the case agent to follow a lead.</p>
+        {% endfor %}
+      </div>
+      <div class="field-note mt-4"><strong>Investigator's reminder</strong><br>Separate observed facts from assumptions. Seek evidence that could disprove your leading theory.</div>
+    </section>
+  </aside>
+</div>
+{{ chat_url|json_script:"chat-url" }}
+{% endblock %}
+{% block scripts %}<script src="{% static 'investigation.js' %}" defer></script>{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "investigations/base.html" %}
+{% load case_tags %}
+{% block title %}Investigation Report — {{ report.title }}{% endblock %}
+{% block content %}
+<header class="report-header mb-4">
+  <a class="small text-secondary text-decoration-none" href="{% url 'case_catalog' %}">← Case archive</a>
+  <p class="eyebrow mt-4 mb-1">INVESTIGATION COMPLETE</p><h1 class="display-6 fw-semibold">{{ report.title }}</h1>
+  <p class="text-secondary mb-0">A review of your decision-making and evidence analysis. This assesses the investigation process—not intelligence or personal traits.</p>
+</header>
+<section class="report-score-card mb-4">
+  <div class="row align-items-center g-3">
+    <div class="col-md-3"><span class="report-score">{{ report.performance.final|default:"—" }}</span><span class="small d-block">overall score / 100</span></div>
+    <div class="col-md-9"><div class="row g-3">
+      <div class="col-4"><span class="metric-label">Outcome</span><strong>{{ report.performance.outcome|default:"—" }}</strong></div>
+      <div class="col-4"><span class="metric-label">Reasoning</span><strong>{{ report.performance.reasoning|default:"—" }}</strong></div>
+      <div class="col-4"><span class="metric-label">Process</span><strong>{{ report.performance.process|default:"—" }}</strong></div>
+    </div></div>
+  </div>
+  {% if report.flags %}<div class="alert alert-warning mt-3 mb-0">{% for flag in report.flags %}<p class="mb-1">{{ flag }}</p>{% endfor %}</div>{% endif %}
+</section>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <section class="report-section mb-4"><p class="eyebrow mb-1">COGNITIVE SKILLS</p><h2 class="h4 mb-3">How you investigated</h2>
+      {% for name, skill in report.skills.items %}
+      <article class="skill-row">
+        <div class="d-flex justify-content-between gap-3"><h3 class="h6 mb-1">{{ name|humanize_key }}</h3><strong>{% if skill.score is None %}Not enough data{% else %}{{ skill.score }}/100{% endif %}</strong></div>
+        {% if skill.score is not None %}<div class="progress mb-2" role="progressbar" aria-label="{{ name }} score" aria-valuenow="{{ skill.score }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ skill.score }}%"></div></div>{% endif %}
+        <p class="small text-secondary mb-0">{{ skill.explanation }}</p>
+      </article>
+      {% endfor %}
+    </section>
+  </div>
+  <div class="col-lg-5">
+    <section class="report-section mb-4"><p class="eyebrow mb-1">FEEDBACK</p><h2 class="h4 mb-3">Strengths</h2>
+      {% if report.strengths %}<ul class="feedback-list">{% for item in report.strengths %}<li>{{ item }}</li>{% endfor %}</ul>{% else %}<p class="text-secondary">Keep investigating to build observable strengths.</p>{% endif %}
+      <h3 class="h5 mt-4">Areas to improve</h3>
+      {% if report.improvements %}<ul class="feedback-list">{% for item in report.improvements %}<li>{{ item }}</li>{% endfor %}</ul>{% else %}<p class="text-secondary">No specific process improvements were identified from the available data.</p>{% endif %}
+      {% if report.recommended_development %}<h3 class="h5 mt-4">Practice suggestions</h3><ul class="feedback-list">{% for item in report.recommended_development %}<li>{{ item }}</li>{% endfor %}</ul>{% endif %}
+    </section>
+    <section class="report-section"><p class="eyebrow mb-1">NEXT TIME</p><h2 class="h5">Missed opportunities</h2>
+      {% if report.missed_opportunities %}<ul class="feedback-list">{% for item in report.missed_opportunities %}<li>{{ item }}</li>{% endfor %}</ul>{% else %}<p class="text-secondary mb-0">No missed opportunities were flagged.</p>{% endif %}
+    </section>
+  </div>
+</div>
+<div class="text-center mt-4"><a class="btn btn-outline-dark" href="{% url 'case_catalog' %}">Return to the case archive</a></div>
+{% endblock %}

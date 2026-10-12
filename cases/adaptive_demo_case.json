@@ -32,5 +32,14 @@
   ],
   "contradictions": [],
   "required_evidence": ["A-03"],
+  "suspects": [{"id": "S-01", "name": "Warehouse employee", "role": "Person of interest"}],
+  "witness_statements": [
+    {"id": "W-01", "person": "Night guard", "evidence_id": "A-04", "statement": "The heater was still glowing red during the 11 PM round."}
+  ],
+  "timeline": [
+    {"time": "Three weeks before the fire", "event": "A frayed heater cord was reported; the work order remained open.", "evidence_id": "A-03"},
+    {"time": "11 PM", "event": "The night guard saw the heater glowing red.", "evidence_id": "A-04"},
+    {"time": "After 9 PM", "event": "No employee badges were used to enter the warehouse.", "evidence_id": "A-05"}
+  ],
   "scoring_weights": {}
 }

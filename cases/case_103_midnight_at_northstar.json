@@ -1,0 +1,33 @@
+{
+  "case_id": "CASE-103",
+  "title": "Midnight at Northstar",
+  "domain": "cybercrime",
+  "difficulty": "medium",
+  "overview": "Northstar Clinic's scheduling system was encrypted overnight and a ransom note appeared. The clinic has offline backups, but a small set of records was accessed first.",
+  "objective": "Identify the likely entry point and determine whether the incident was external opportunism or enabled by a compromised staff account.",
+  "time_limit_minutes": null,
+  "hypotheses": [
+    {"id": "H1", "level": "correct", "statement": "An outside attacker used a stolen vendor account whose credentials were exposed in a phishing message.", "match_keywords": ["attacker", "stolen", "vendor", "phishing", "credentials", "outside"]},
+    {"id": "H2", "level": "incorrect", "statement": "A clinic employee intentionally encrypted the system to disrupt operations.", "match_keywords": ["employee", "insider", "deliberate", "clinic", "disrupt"]}
+  ],
+  "evidence": [
+    {"id": "N-01", "title": "Incident timeline", "type": "report", "reliability": 0.9, "relevance": 0.5, "directness": 0.4, "initial": true, "content": "Scheduling workstations became unavailable at 12:14 AM. The ransom note requested payment in cryptocurrency."},
+    {"id": "N-02", "title": "System access overview", "type": "log", "reliability": 0.9, "relevance": 0.55, "directness": 0.4, "initial": true, "content": "The last privileged login used a vendor support account. No staff badge entry was recorded after 9 PM."},
+    {"id": "N-03", "title": "Authentication audit", "type": "log", "reliability": 0.98, "relevance": 0.95, "directness": 0.9, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["login", "authentication", "account", "audit"]}, "content": "The vendor account authenticated from a new overseas address using a password-only login. Multi-factor authentication had been disabled during a support call."},
+    {"id": "N-04", "title": "Helpdesk phishing report", "type": "email", "reliability": 0.8, "relevance": 0.9, "directness": 0.75, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["phishing", "email", "message", "vendor"]}, "content": "A technician reported a convincing vendor password-reset email received two days earlier. The message linked to a lookalike support portal."},
+    {"id": "N-05", "title": "Endpoint review", "type": "forensic report", "reliability": 0.9, "relevance": 0.7, "directness": 0.65, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["malware", "endpoint", "workstation", "forensic"]}, "content": "The encryption process was launched remotely through the vendor management tool. No local executable or staff USB activity was found."}
+  ],
+  "contradictions": [{"id": "C-1", "evidence": ["N-03", "N-05"]}],
+  "required_evidence": ["N-03", "N-04"],
+  "suspects": [
+    {"id": "S-01", "name": "Unknown external actor", "role": "Likely operator using a compromised support account", "evidence_id": "N-03"},
+    {"id": "S-02", "name": "Clinic IT technician", "role": "Recipient of a suspicious password-reset email", "evidence_id": "N-04"}
+  ],
+  "witness_statements": [{"id": "W-01", "person": "Clinic IT technician", "evidence_id": "N-04", "statement": "They received a password-reset email that appeared to come from the support vendor."}],
+  "timeline": [
+    {"time": "Two days before incident", "event": "A technician received a lookalike vendor reset message.", "evidence_id": "N-04"},
+    {"time": "11:56 PM", "event": "The vendor support account authenticated from a new address.", "evidence_id": "N-03"},
+    {"time": "12:14 AM", "event": "The scheduling system became unavailable.", "evidence_id": "N-01"}
+  ],
+  "scoring_weights": {}
+}

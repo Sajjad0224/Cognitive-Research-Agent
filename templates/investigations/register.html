@@ -1,0 +1,28 @@
+{% extends "investigations/base.html" %}
+{% block title %}Create account — Cognitive Research Platform{% endblock %}
+{% block content %}
+<section class="auth-layout">
+  <div class="auth-aside">
+    <p class="eyebrow mb-2">A MORE THOUGHTFUL CASE FILE</p>
+    <h1 class="display-6 fw-semibold mb-3">Make every investigation count.</h1>
+    <p class="text-secondary mb-0">Create an account to save your progress and access personal performance reports. Case browsing remains open to everyone.</p>
+  </div>
+  <div class="auth-card">
+    <h2 class="h3 mb-1">Create your account</h2>
+    <p class="text-secondary mb-4">A few details to get started.</p>
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" novalidate>{% csrf_token %}
+      {% for field in form %}
+      <div class="mb-3">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+        {% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors|join:", " }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <button class="btn btn-primary w-100 mt-2" type="submit">Create account</button>
+    </form>
+    <p class="small text-secondary text-center mt-4 mb-0">Already registered? <a href="{% url 'login' %}">Log in</a></p>
+  </div>
+</section>
+{% endblock %}

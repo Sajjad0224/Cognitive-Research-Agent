@@ -1,0 +1,36 @@
+{
+  "case_id": "CASE-105",
+  "title": "The Last Train Home",
+  "domain": "missing persons",
+  "difficulty": "easy",
+  "overview": "Graduate student Amara Ellis did not arrive home after leaving the campus library. Her phone went offline near the central station, and friends report no recent conflict.",
+  "objective": "Build a reliable timeline, evaluate the last confirmed sighting, and identify the most credible explanation for Amara's disappearance.",
+  "time_limit_minutes": null,
+  "hypotheses": [
+    {"id": "H1", "level": "correct", "statement": "Amara missed her train after assisting an injured passenger and later contacted a friend from a nearby station.", "match_keywords": ["Amara", "missed train", "passenger", "station", "contacted", "helped"]},
+    {"id": "H2", "level": "incorrect", "statement": "Amara left voluntarily to avoid her research group after a disagreement.", "match_keywords": ["voluntary", "left", "avoid", "disagreement", "run away"]}
+  ],
+  "evidence": [
+    {"id": "M-01", "title": "Missing person intake", "type": "report", "reliability": 0.85, "relevance": 0.5, "directness": 0.4, "initial": true, "content": "Amara left the campus library at 8:32 PM and did not arrive at her shared apartment. Her phone last connected near Central Station."},
+    {"id": "M-02", "title": "Library exit camera summary", "type": "video summary", "reliability": 0.9, "relevance": 0.55, "directness": 0.45, "initial": true, "content": "Amara left carrying her backpack and walked toward the westbound bus stop. She appeared calm and used her transit card."},
+    {"id": "M-03", "title": "Station service log", "type": "log", "reliability": 0.95, "relevance": 0.9, "directness": 0.8, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["station", "service", "delay", "train", "incident"]}, "content": "A medical assistance call at Central Station delayed the 8:50 PM train. A passenger described a student matching Amara's clothing helping station staff."},
+    {"id": "M-04", "title": "Transit card history", "type": "log", "reliability": 0.98, "relevance": 0.85, "directness": 0.75, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["transit", "card", "tap", "journey"]}, "content": "Amara's card was tapped at the neighboring Riverside station at 9:26 PM, after the Central Station delay."},
+    {"id": "M-05", "title": "Friend's message", "type": "message", "reliability": 0.75, "relevance": 0.85, "directness": 0.7, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["friend", "message", "phone", "contact"]}, "content": "At 9:41 PM, Amara messaged her friend: 'Train issue. Helping someone at Central; heading over to Riverside now. Battery low.'"}
+  ],
+  "contradictions": [{"id": "C-1", "evidence": ["M-03", "M-05"]}],
+  "required_evidence": ["M-03", "M-04", "M-05"],
+  "suspects": [
+    {"id": "S-01", "name": "No person of interest identified", "role": "Available evidence points to a travel disruption rather than an abduction", "evidence_id": "M-01"}
+  ],
+  "witness_statements": [
+    {"id": "W-01", "person": "Passenger at Central Station", "evidence_id": "M-03", "statement": "A student matching Amara's clothing helped station staff during a medical assistance call."},
+    {"id": "W-02", "person": "Amara's friend", "evidence_id": "M-05", "statement": "Amara said she was delayed while helping someone and was heading to Riverside."}
+  ],
+  "timeline": [
+    {"time": "8:32 PM", "event": "Amara left the campus library.", "evidence_id": "M-01"},
+    {"time": "8:50 PM", "event": "A medical call delayed the train at Central Station.", "evidence_id": "M-03"},
+    {"time": "9:26 PM", "event": "Amara's transit card was used at Riverside station.", "evidence_id": "M-04"},
+    {"time": "9:41 PM", "event": "Amara messaged a friend that she was delayed and her battery was low.", "evidence_id": "M-05"}
+  ],
+  "scoring_weights": {}
+}

@@ -63,6 +63,25 @@
     {"id": "C-1", "evidence": ["E-05", "E-06"]},
     {"id": "C-2", "evidence": ["E-02", "E-04"]}
   ],
+  "suspects": [
+    {"id": "S-01", "name": "Ken Chen", "role": "Postdoctoral researcher; Trial X analysis lead", "evidence_id": "E-03"},
+    {"id": "S-02", "name": "Lina Park", "role": "Graduate student", "evidence_id": "E-03"},
+    {"id": "S-03", "name": "Sam Ortiz", "role": "Systems administrator", "evidence_id": "E-03"}
+  ],
+  "witness_statements": [
+    {"id": "W-01", "person": "Ken Chen", "evidence_id": "E-05", "statement": "He says he was at home sick and did not use the lab workstation."},
+    {"id": "W-02", "person": "Lina Park", "evidence_id": "E-07", "statement": "She says she left the lab at 18:00 and was not on campus that night."}
+  ],
+  "timeline": [
+    {"time": "Tuesday 18:05", "event": "Lina Park's last recorded building badge swipe.", "evidence_id": "E-06"},
+    {"time": "Tuesday 21:50", "event": "Ken Chen last edited the analysis notebook.", "evidence_id": "E-09"},
+    {"time": "Tuesday 21:58", "event": "A message from Ken Chen refers to making the outlier problem go away.", "evidence_id": "E-10"},
+    {"time": "Tuesday 22:00", "event": "A server snapshot was taken.", "evidence_id": "E-09"},
+    {"time": "Tuesday 23:20", "event": "Ken Chen's badge was used to enter the lab building.", "evidence_id": "E-06"},
+    {"time": "Tuesday 23:41", "event": "The Trial X folder was deleted from the lab workstation account.", "evidence_id": "E-04"},
+    {"time": "Wednesday 02:00", "event": "The announced server migration window began.", "evidence_id": "E-02"},
+    {"time": "Wednesday 08:10", "event": "The missing data was discovered.", "evidence_id": "E-01"}
+  ],
   "required_evidence": ["E-04", "E-06", "E-09", "E-10"],
   "scoring_weights": {}
 }

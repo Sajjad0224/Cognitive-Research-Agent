@@ -1,0 +1,34 @@
+{
+  "case_id": "CASE-102",
+  "title": "The Vanishing Blue Diamond",
+  "domain": "high-value theft",
+  "difficulty": "easy",
+  "overview": "A blue diamond disappears from a locked display during a crowded charity preview. The alarm never sounded, and several people had legitimate access.",
+  "objective": "Reconstruct how the diamond was removed and distinguish a planned inside theft from an opportunity theft.",
+  "time_limit_minutes": null,
+  "hypotheses": [
+    {"id": "H1", "level": "correct", "statement": "Exhibitions manager Rowan Pike used a copied display key during a scheduled lighting test to steal the diamond.", "match_keywords": ["Rowan", "Pike", "copied key", "lighting test", "planned", "manager", "stole"]},
+    {"id": "H2", "level": "incorrect", "statement": "A guest lifted the diamond during the reception and escaped through the public entrance.", "match_keywords": ["guest", "visitor", "reception", "public", "snatched"]}
+  ],
+  "evidence": [
+    {"id": "D-01", "title": "Loss report", "type": "report", "reliability": 0.9, "relevance": 0.5, "directness": 0.4, "initial": true, "content": "The blue diamond was discovered missing at 8:10 PM. The locked display showed no visible damage."},
+    {"id": "D-02", "title": "Event access list", "type": "document", "reliability": 1.0, "relevance": 0.35, "directness": 0.2, "initial": true, "content": "Guests entered through one monitored entrance. Rowan Pike, security lead Nia Grant, and technician Leon Wu held staff access."},
+    {"id": "D-03", "title": "Display alarm maintenance log", "type": "log", "reliability": 0.95, "relevance": 0.9, "directness": 0.8, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["alarm", "maintenance", "sensor", "display"]}, "content": "The case alarm was placed in service mode at 6:42 PM for a lighting test requested by Rowan Pike. Service mode disables the open sensor."},
+    {"id": "D-04", "title": "Key cabinet audit", "type": "log", "reliability": 0.9, "relevance": 0.95, "directness": 0.9, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["key", "cabinet", "duplicate", "lock"]}, "content": "A key blank was removed from the cabinet two days earlier using Rowan's code. No duplicate key was returned."},
+    {"id": "D-05", "title": "Entrance camera summary", "type": "video summary", "reliability": 0.9, "relevance": 0.8, "directness": 0.75, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["camera", "video", "entrance", "guest"]}, "content": "The guest entrance remained continuously staffed. No guest left carrying an item or bypassed the bag check."}
+  ],
+  "contradictions": [{"id": "C-1", "evidence": ["D-04", "D-05"]}],
+  "required_evidence": ["D-03", "D-04"],
+  "suspects": [
+    {"id": "S-01", "name": "Rowan Pike", "role": "Exhibitions manager who requested the lighting test", "evidence_id": "D-02"},
+    {"id": "S-02", "name": "Nia Grant", "role": "Security lead", "evidence_id": "D-02"},
+    {"id": "S-03", "name": "Leon Wu", "role": "Lighting technician", "evidence_id": "D-02"}
+  ],
+  "witness_statements": [{"id": "W-01", "person": "Nia Grant", "evidence_id": "D-05", "statement": "The entrance was monitored throughout the reception and no guest bypassed the exit checks."}],
+  "timeline": [
+    {"time": "Two days earlier", "event": "A key blank was removed using Rowan Pike's access code.", "evidence_id": "D-04"},
+    {"time": "6:42 PM", "event": "The display alarm was placed in service mode for a lighting test.", "evidence_id": "D-03"},
+    {"time": "8:10 PM", "event": "The diamond was reported missing.", "evidence_id": "D-01"}
+  ],
+  "scoring_weights": {}
+}

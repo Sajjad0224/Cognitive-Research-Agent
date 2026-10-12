@@ -1,0 +1,33 @@
+{
+  "case_id": "CASE-104",
+  "title": "The Harborlight Ledger",
+  "domain": "financial fraud",
+  "difficulty": "medium",
+  "overview": "A regional charity finds a series of small payments to a newly created supplier. The transfers are individually below the normal review threshold.",
+  "objective": "Trace who approved the payments and determine whether the supplier was legitimate or a vehicle for deliberate misappropriation.",
+  "time_limit_minutes": null,
+  "hypotheses": [
+    {"id": "H1", "level": "correct", "statement": "Finance director Owen Price created a shell supplier and split invoices to divert charity funds.", "match_keywords": ["Owen", "Price", "shell", "supplier", "split", "divert", "fraud"]},
+    {"id": "H2", "level": "incorrect", "statement": "The payments were legitimate emergency purchases entered under a temporary supplier name.", "match_keywords": ["legitimate", "emergency", "temporary", "purchase", "error"]}
+  ],
+  "evidence": [
+    {"id": "F-01", "title": "Internal audit notice", "type": "report", "reliability": 0.95, "relevance": 0.5, "directness": 0.4, "initial": true, "content": "Nine payments totaling $38,400 were made to Harborlight Services over six weeks. No active contract is listed."},
+    {"id": "F-02", "title": "Payment approval matrix", "type": "document", "reliability": 1.0, "relevance": 0.4, "directness": 0.2, "initial": true, "content": "Payments below $5,000 require one finance approver. Owen Price managed supplier onboarding and routine approvals."},
+    {"id": "F-03", "title": "Supplier registration file", "type": "document", "reliability": 0.9, "relevance": 0.9, "directness": 0.8, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["supplier", "registration", "address", "onboarding"]}, "content": "Harborlight Services was registered from a mailbox address. Its contact number matches a personal number listed for Owen Price."},
+    {"id": "F-04", "title": "Invoice pattern analysis", "type": "audit analysis", "reliability": 0.95, "relevance": 0.9, "directness": 0.85, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["invoice", "amount", "pattern", "payments"]}, "content": "Each invoice was $4,800 or less, just below the independent review threshold. Descriptions repeat the same generic wording."},
+    {"id": "F-05", "title": "Program staff interviews", "type": "interview summary", "reliability": 0.75, "relevance": 0.75, "directness": 0.7, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["staff", "interview", "services", "delivery"]}, "content": "Program leads said no Harborlight Services work was requested or delivered during the payment period."}
+  ],
+  "contradictions": [{"id": "C-1", "evidence": ["F-03", "F-05"]}],
+  "required_evidence": ["F-03", "F-04", "F-05"],
+  "suspects": [
+    {"id": "S-01", "name": "Owen Price", "role": "Finance director responsible for onboarding and approvals", "evidence_id": "F-02"},
+    {"id": "S-02", "name": "Harborlight Services", "role": "New supplier with no known work history", "evidence_id": "F-03"}
+  ],
+  "witness_statements": [{"id": "W-01", "person": "Program leads", "evidence_id": "F-05", "statement": "They did not request or receive services from Harborlight Services."}],
+  "timeline": [
+    {"time": "Six weeks earlier", "event": "Harborlight Services was added as a supplier.", "evidence_id": "F-03"},
+    {"time": "Over six weeks", "event": "Nine payments were approved below the independent review threshold.", "evidence_id": "F-04"},
+    {"time": "Audit review", "event": "Program leads confirmed no work had been delivered.", "evidence_id": "F-05"}
+  ],
+  "scoring_weights": {}
+}

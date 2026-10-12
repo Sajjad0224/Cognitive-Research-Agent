@@ -1,7 +1,63 @@
 # Cognitive Research Agent — build plan & status
 
-Setup: `pip install -r requirements.txt`. Tests: `python -m pytest -q` (73, all offline/no network). Demo: `python demo.py`.
-API: `python main.py` then open http://127.0.0.1:8000/ (UI) or /docs (API) (Python 3.10+; core engine is stdlib-only).
+## Django rebuild: crime-investigation chatbot
+
+The supported product is now a Django-rendered, Bootstrap 5 case investigation experience. The
+case archive is public; users can investigate without an account or create an account to keep
+progress and access personal performance reports across sessions. Users interrogate a case agent,
+open discovered records, submit a sourced conclusion, and receive the existing deterministic
+cognitive-performance report.
+
+### Run locally
+
+```powershell
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py load_cases
+python manage.py runserver
+```
+
+Open <http://127.0.0.1:8000/>. The built-in local default is SQLite. For a deployed or multi-user
+installation, PostgreSQL is recommended: set `DATABASE_URL=postgresql://user:password@host:5432/db`
+and `DJANGO_SECRET_KEY`, then run the same migration and case-import commands. Set
+`DJANGO_DEBUG=false` and `DJANGO_ALLOWED_HOSTS` for deployment. If HTTPS terminates at Django,
+set `DJANGO_SECURE_SSL_REDIRECT=true`, `DJANGO_SECURE_COOKIES=true`, and a deliberate
+`DJANGO_HSTS_SECONDS` value. Configure equivalent redirects and cookie security at a trusted TLS
+proxy when TLS terminates upstream.
+
+The case importer validates every JSON dataset with the project's strict case-schema parser. The
+catalog ships with ten database-loaded investigations across research integrity, workplace safety,
+murder mysteries, theft, cybercrime, fraud, missing persons, and suspicious incidents.
+Structured case records are stored in the database (`CaseRecord.dataset`), while investigation
+actions are persisted as append-only ORM events. Authenticated investigations are linked to their
+Django account; existing anonymous sessions remain private to the browser session. Evidence
+discovery and report scoring continue to
+use the established investigation engine; chatbot responses retrieve from discovered database
+records only and cite their evidence IDs. Suspect identities, statements, and timeline data are
+available to the investigation logic as structured case dataset fields.
+
+### Rebuild phases
+
+| Phase | Scope | Status |
+| --- | --- | --- |
+| 1 | Django foundation, public archive, structured case database, anonymous investigations, evidence-grounded chat, conclusion and report | Implemented |
+| 2 | Case authoring/admin tools and expanded structured suspects, witnesses, forensic exhibits, and timelines | Planned |
+| 3 | Improve conversational retrieval and investigation UX using verified case evidence | Planned |
+| 4 | PostgreSQL deployment, privacy/retention controls, and operational hardening | Planned |
+
+This is deliberately a conversation-led investigation workflow, not a dashboard. The existing
+FastAPI compatibility module remains for the original regression suite; it is not the product
+entry point. Use Django's `manage.py` for the application.
+
+Tests: `python manage.py test investigations` for the Django product flows; install
+`requirements-test.txt` before running `python -m pytest -q` for the legacy engine regression suite.
+The domain evaluator remains
+deterministic and fully offline.
+
+## Original engine notes
+
+The sections below describe the retained Python investigation/evaluation engine and its original
+FastAPI compatibility layer.
 
 ## Phases
 | # | Phase | Status |

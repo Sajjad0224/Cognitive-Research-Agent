@@ -1,0 +1,33 @@
+{
+  "case_id": "CASE-108",
+  "title": "The Riverside Safe",
+  "domain": "commercial burglary",
+  "difficulty": "medium",
+  "overview": "A neighborhood theater's payroll cash disappears from a locked office safe overnight. The alarm records a brief power interruption, but there is no forced entry.",
+  "objective": "Determine whether the safe was opened during a genuine outage or by someone using authorized access to disguise a theft.",
+  "time_limit_minutes": null,
+  "hypotheses": [
+    {"id": "H1", "level": "correct", "statement": "Night manager Tessa Quinn used the maintenance key during a planned power interruption to take the payroll cash.", "match_keywords": ["Tessa", "Quinn", "manager", "maintenance key", "planned", "cash", "stole"]},
+    {"id": "H2", "level": "incorrect", "statement": "An unknown burglar entered through the loading bay during an accidental power outage.", "match_keywords": ["unknown burglar", "loading bay", "accidental", "outage", "forced"]}
+  ],
+  "evidence": [
+    {"id": "R-01", "title": "Theft report", "type": "report", "reliability": 0.9, "relevance": 0.5, "directness": 0.4, "initial": true, "content": "Payroll cash was missing from the Riverside Theater office safe at opening. The safe and office door showed no damage."},
+    {"id": "R-02", "title": "Closing staff roster", "type": "document", "reliability": 1.0, "relevance": 0.4, "directness": 0.2, "initial": true, "content": "Night manager Tessa Quinn and technician Andre Bell closed the theater. Both had access to the building; only the manager held the safe override key."},
+    {"id": "R-03", "title": "Power and alarm logs", "type": "log", "reliability": 0.95, "relevance": 0.9, "directness": 0.8, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["power", "alarm", "outage", "electricity"]}, "content": "The office circuit was manually isolated for four minutes at 11:37 PM. The building's other circuits stayed online and the alarm was disarmed with a manager code."},
+    {"id": "R-04", "title": "Loading bay inspection", "type": "inspection", "reliability": 0.9, "relevance": 0.8, "directness": 0.7, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["loading", "bay", "door", "entry"]}, "content": "The loading bay was secured from inside. Dust and seal marks around the door were undisturbed; no outside entry was detected."},
+    {"id": "R-05", "title": "Maintenance key register", "type": "log", "reliability": 0.9, "relevance": 0.9, "directness": 0.85, "supports": ["H1"], "contradicts": ["H2"], "unlock": {"keywords": ["key", "register", "safe", "override"]}, "content": "The safe override key was checked out by Tessa Quinn and returned the following morning. The return time was recorded before the cash shortage was reported."}
+  ],
+  "contradictions": [{"id": "C-1", "evidence": ["R-03", "R-04"]}],
+  "required_evidence": ["R-03", "R-05"],
+  "suspects": [
+    {"id": "S-01", "name": "Tessa Quinn", "role": "Night manager with safe override access", "evidence_id": "R-02"},
+    {"id": "S-02", "name": "Andre Bell", "role": "Closing technician without safe access", "evidence_id": "R-02"}
+  ],
+  "witness_statements": [{"id": "W-01", "person": "Opening supervisor", "evidence_id": "R-01", "statement": "The office was locked and the safe had no signs of forced entry when the shortage was found."}],
+  "timeline": [
+    {"time": "11:37 PM", "event": "The office circuit was manually isolated and alarm disarmed.", "evidence_id": "R-03"},
+    {"time": "After closing", "event": "The manager safe key was checked out and returned.", "evidence_id": "R-05"},
+    {"time": "At opening", "event": "Payroll cash was found missing.", "evidence_id": "R-01"}
+  ],
+  "scoring_weights": {}
+}
